@@ -1,112 +1,112 @@
 # Modul Keuangan
 
-## Sub Modul Master Data Keuangan
+## Prinsip Dasar (Architecture)
 
-### Tahun Buku
+### Integritas Data & Concurrency
+- **Atomic Updates:** Update saldo **dilarang keras** hanya mengandalkan observer sederhana. Wajib menggunakan mekanisme atomic (`increment`/`decrement`) di level database untuk menangani *race condition* pada situasi *high concurrency* (misal: saat daftar ulang).
+- **Database Locking:** Menggunakan `lockForUpdate()` (Pessimistic Locking) saat memproses transaksi pembayaran untuk memastikan satu rekening dikunci eksklusif sampai transaksi selesai.
 
-- financial year menggunakan tahun ajaran sebagai tahun buku. 
-- Tahun Buku Otomatis tergenerate berdasarkan Tahun Ajaran.
-- Jika tahun ajaran tidak aktif, maka tahun buku tidak bisa CRUD.
-- Tahun Buku hanya bisa di hapus jika tidak ada data transaksi.
-
-### Rekening/Dompet Kas (`financial_accounts`)
-
-- CRUD Rekening/Dompet Kas per lembaga.
-- Rekening/Dompet Kas harus di aktifkan sebelum bisa digunakan.
-- Lembaga bisa memiliki lebih dari 1 rekening/dompet kas.
-- Kolom `balance` adalah cache dari `SUM(cash_mutations)` untuk performa dashboard.
-- Balance Caching. Saldo otomatis update via Laravel Observer (`CashMutationObserver`) saat ada mutasi baru.
-- Recalculate. Fitur reset saldo dari total mutasi (hidden in Settings)
-
-### Pos Anggaran (`budget_categories`)
-
-- CRUD Pos Anggaran per lembaga. Kode akun hierarkis (4.1 Pemasukan, 5.1 Pengeluaran)
-- Type: Income (Masuk) / Expense (Keluar)
-- Per-Lembaga: Setiap lembaga punya pos anggaran sendiri
-
-## Komponen Biaya (`fee_components`)
-
-| Field         | Contoh                          |
-| ------------- | ------------------------------- |
-| Nama          | SPP, Uang Gedung, Seragam, Buku |
-| Tipe          | Monthly, Yearly, Once           |
-| Target Kelas  | Kelas 7 / 8 / 9 / Semua         |
-| Target Gender | L / P / Semua                   |
-
-## Tagihan Santri (`bills`)
-
-- **Auto-Generate:** Saat santri mendaftar via `Student::generateBills()`
-- **Discount:** `initial_amount` - `discount_amount` = `amount`
-- **Status:** Unpaid → Partial → Paid / Cancelled
-- **Periode:** Bulan & Tahun tagihan (untuk SPP bulanan)
-
-## Pembayaran (`payments`)
-
-| Fitur            | Deskripsi                               |
-| ---------------- | --------------------------------------- |
-| **Lokasi Input** | PANITIA (Pusat) atau LEMBAGA (Langsung) |
-| **Metode**       | Cash / Transfer                         |
-| **Status**       | Pending → Success / Failed              |
-| **Kwitansi**     | Cetak PDF dengan QR Code verifikasi     |
-| **Bukti**        | Upload foto bukti transfer              |
-
-## Alokasi Pembayaran (`payment_allocations`)
-
-> **PENTING:** 1x bayar bisa dialokasikan ke banyak tagihan!
-
-Contoh: Bayar Rp 1.000.000 dialokasikan ke:
-
-- SPP Januari: Rp 200.000
-- SPP Februari: Rp 200.000
-- Uang Gedung (Cicilan): Rp 600.000
-
-## Saldo Santri (`student_wallets`)
-
-- **Kelebihan Bayar:** Jika bayar lebih, masuk ke saldo
-- **Potong Otomatis:** Saldo bisa dipotong untuk tagihan berikutnya
-
-## Pengeluaran Lembaga (`expenses`)
-
-- **Input:** Judul, deskripsi, nominal, bukti nota
-- **Approval:** Pending → Approved / Rejected
-- **Pos Anggaran:** Kategorisasi (Listrik, ATK, Honor, dll)
-
-## Pemasukan Non-Santri (`incomes`)
-
-- **Sumber:** Hibah, Donasi, Bantuan Pemerintah
-- **Tracking:** Dari siapa, untuk apa, berapa
-
-## Arus Kas / Jurnal (`cash_mutations`)
-
-> **Tabel Inti:** Semua pergerakan uang tercatat di sini!
-
-| Fitur                | Deskripsi                                                   |
-| -------------------- | ----------------------------------------------------------- |
-| **Polymorphic**      | Link ke `payments`, `expenses`, `incomes`, `fund_transfers` |
-| **Balance Snapshot** | `balance_after` = saldo setelah transaksi                   |
-| **Bukti**            | Foto nota/kuitansi                                          |
-
-## Distribusi Dana (`fund_transfers`)
-
-> **Flow:** Dana dari Panitia Pusat → Lembaga
-
-- **Status:** Pending → Approved → Completed / Rejected
-- **Approval:** Siapa yang approve, kapan
-- **Receipt:** Siapa yang terima, kapan
-
-## WhatsApp Billing
-
-- **Auto-Reminder:** Kirim tagihan via Fonnte (Cron Job)
-- **Template:** Salam, detail tagihan, total, link bayar
-
-## Laporan Keuangan
-
-| Laporan                  | Deskripsi                        |
-| ------------------------ | -------------------------------- |
-| Rekapitulasi Pemasukan   | Per hari/minggu/bulan/tahun      |
-| Rekapitulasi Pengeluaran | Per pos anggaran                 |
-| Tunggakan Santri         | List santri dengan sisa tagihan  |
-| Arus Kas                 | Jurnal masuk-keluar per rekening |
-| Neraca Saldo             | Total saldo semua rekening       |
+### Immutable Ledger (Jurnal Tak Dapat Diubah)
+- **No Hard Delete:** Data transaksi keuangan yang sudah terekonsiliasi **haram** dihapus atau diedit nominalnya.
+- **Reversal Mechanism (Koreksi) untuk Data Transaksi:** Jika terjadi kesalahan input (misal salah nominal), sistem tidak boleh mengedit baris transaksi lama. Sistem wajib membuat "Transaksi Koreksi" (Reversal Transaction) yang membalikkan nilai tersebut, kemudian membuat transaksi baru yang benar. Hal ini untuk menjaga *Audit Trail*.
+- **Soft Deletes untuk Data Master:** Jika fitur hapus mutlak diperlukan untuk data master, wajib menggunakan *Soft Deletes*.
 
 ---
+
+## Sub-Modul Master Data Keuangan
+
+### Tahun Buku & Tutup Buku (`period_closings`)
+- **Tahun Buku:** Otomatis mengikuti Tahun Ajaran.
+- **Monthly Closing (Tutup Buku Bulanan):** Fitur untuk mengunci transaksi pada bulan tertentu (misal: Tanggal 10 bulan berikutnya, transaksi bulan lalu dikunci).
+  - Admin tidak bisa input/edit/hapus transaksi di periode yang terkunci.
+  - Menjaga konsistensi laporan yang sudah diserahkan ke Yayasan.
+
+### Rekening/Dompet Kas (`financial_accounts`)
+- CRUD Rekening/Dompet Kas per lembaga.
+- **Balance Caching:** Kolom `balance` hanya digunakan sebagai cache untuk performa read. Update wajib via *Atomic Operations*.
+- **Rekonsiliasi:** Fitur untuk mencocokkan saldo sistem dengan saldo fisik/bank (Opname Kas).
+
+### Pos Anggaran (`budget_categories`)
+- Hierarki Kode Akun (Chart of Accounts).
+- **Budgeting:** Menentukan batas anggaran per Pos untuk keperluan "Laporan Realisasi Anggaran".
+
+---
+
+## Sub-Modul Manajemen Biaya & Pendapatan
+
+### Komponen Biaya (`fee_components`)
+- **Tipe:** Bulanan (SPP), Tahunan (Uang Gedung), Sekali (Pendaftaran).
+- **Insidentil:** Denda pelanggaran, Ganti rugi barang, Biaya kesehatan mendadak (Manual Bill).
+- **Prioritas Pembayaran:** Komponen memiliki level prioritas (misal: 1. SPP, 2. Makan, 3. Ekstra).
+
+### Penyesuaian Biaya (`student_fee_adjustments`)
+- **Beasiswa & Subsidi:** Menangani kasus diskon khusus (misal: Anak Yatim diskon 50%, Prestasi diskon 100%).
+- **Logic:** Saat tagihan di-generate, sistem mengecek tabel penyesuaian ini.
+
+### Tagihan Santri (`bills`)
+- **Auto-Generate:** Massal berdasarkan kelas/status aktif.
+- **Manual Creation:** Admin bisa membuat tagihan insidentil per siswa.
+- **Status:** Unpaid → Partial → Paid / Cancelled.
+
+---
+
+## Pembayaran & Digitalisasi
+
+### Integrasi Payment Gateway (VA)
+- **Virtual Account (Prioritas):** Integrasi (Xendit/Midtrans/Flip) agar wali murid mendapat nomor VA unik (Bank + NIS).
+- **Otomatisasi:**
+  - Terima Callback/Webhook dari bank.
+  - Tagihan lunas detik itu juga.
+  - Saldo terupdate otomatis.
+  - Notifikasi WA terkirim otomatis.
+- **Manual Upload:** Hanya opsi cadangan jika sistem VA error.
+
+### Alokasi Pembayaran (`payment_allocations`)
+- **Prioritas Otomatis:** Jika orang tua transfer gelondongan (misal 1jt) tanpa keterangan, sistem melunasi tagihan berdasarkan urutan prioritas (`fee_priorities`).
+  1. Tunggakan SPP terlama.
+  2. Tunggakan Uang Makan.
+  3. Uang Gedung.
+  4. Sisa -> Masuk ke Tuition Wallet.
+
+---
+
+## Manajemen Wallet Santri (`student_wallets`)
+
+Pemisahan tegas fungsi dompet untuk mendukung *Cashless Society*.
+
+### 1. Tuition Wallet (Deposit Pendidikan)
+- **Fungsi:** Menyimpan kelebihan bayar SPP/Biaya Pendidikan.
+- **Restriksi:** Tidak bisa ditarik tunai oleh santri.
+- **Auto-Debet:** Sistem otomatis mengambil dana dari sini saat tagihan bulan baru muncul.
+
+### 2. Pocket Money Wallet (Tabungan/Uang Saku)
+- **Fungsi:** Uang jajan harian santri.
+- **Fitur:**
+  - **Top-up:** Via VA atau Admin TU.
+  - **Limit Harian:** Orang tua bisa set batas jajan per hari.
+  - **POS Integrasi:** Bisa dipakai belanja di Kantin/Koperasi (Scan Kartu/QR).
+  - **Withdrawal:** Bisa ditarik tunai jika izin pulang/sakit.
+
+---
+
+## Akuntansi & Laporan (`financial_transactions`)
+
+### Struktur Data Transaksi
+- **Financial Transactions (Header):** Mencatat "Event/Kejadian" (No Transaksi, Siapa, Kapan, Status).
+- **Journal Entries (Detail):** Mencatat pergerakan akuntansi (Debit Rekening A, Kredit Pos B).
+
+### Pengeluaran Lembaga (`expenses`)
+- **Budget Control:** Saat input pengeluaran, sistem memberi warning jika `Actual > Budget` bulan berjalan.
+- **Approval:** Bertingkat (Admin Unit -> Kepala -> Yayasan).
+
+### Laporan Keuangan (Yayasan Standard)
+1. **Laporan Realisasi Anggaran:** Membandingkan *Budget Plan* vs *Actual Expense*. (Kontrol efisiensi).
+2. **Aging Report (Umur Piutang):** Analisa tunggakan Santri (Grouping: 1-3 bulan, 3-6 bulan, >6 bulan) untuk strategi penagihan.
+3. **Arus Kas (Cash Flow):** Mutasi detail per rekening.
+4. **Rekapitulasi Pemasukan & Pengeluaran.**
+
+---
+
+## WhatsApp Billing & Notifikasi
+- Reminder tagihan otomatis (Cron Job).
+- Notifikasi Real-time saat: Pembayaran masuk, Tagihan baru, Saldo tabungan menipis.
