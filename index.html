@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super-App Dar Al Tauhid | Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Flowbite CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-active { background-color: #f3f4f6; color: #057a55; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200">
+        <div class="px-3 py-3 lg:px-5 lg:pl-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center justify-start rtl:justify-end">
+                    <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                        <span class="sr-only">Open sidebar</span>
+                        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
+                        </svg>
+                    </button>
+                    <a href="#" class="flex ms-2 md:me-24">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-600 me-3">
+                            <span class="text-white font-bold">DT</span>
+                        </div>
+                        <span class="self-center text-xl font-bold sm:text-2xl whitespace-nowrap text-emerald-800">Dar Al Tauhid</span>
+                    </a>
+                </div>
+
+                <!-- Right Side Actions -->
+                <div class="flex items-center">
+                    <!-- Institution Switcher -->
+                    <div class="hidden md:flex items-center me-4">
+                        <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5">
+                            <option selected>Yayasan Pusat</option>
+                            <option value="PPDT">Pondok Pesantren (PPDT)</option>
+                            <option value="MDT">Madrasah Diniyah (MDT)</option>
+                            <option value="SMPPDT">SMP Plus (SMPPDT)</option>
+                            <option value="MANUS">MA Nusantara (MANUS)</option>
+                            <option value="MISDT">MIS Dar Al Tauhid (MISDT)</option>
+                        </select>
+                    </div>
+
+                    <!-- User Profile -->
+                    <div class="flex items-center ms-3">
+                        <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300" aria-expanded="false" data-dropdown-toggle="dropdown-user">
+                            <span class="sr-only">Open user menu</span>
+                            <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-semibold">SA</div>
+                        </button>
+                        <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">
+                            <div class="px-4 py-3" role="none">
+                                <p class="text-sm text-gray-900" role="none">Super Admin</p>
+                                <p class="text-sm font-medium text-gray-900 truncate" role="none">admin@daraltauhid.com</p>
+                            </div>
+                            <ul class="py-1" role="none">
+                                <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profil</a></li>
+                                <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pengaturan</a></li>
+                                <li><a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Keluar</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0" aria-label="Sidebar">
+        <div class="h-full px-3 pb-4 overflow-y-auto bg-white">
+            <ul class="space-y-2 font-medium">
+                <li>
+                    <a href="#" class="flex items-center p-2 text-emerald-900 rounded-lg sidebar-active group">
+                        <svg class="w-5 h-5 transition duration-75 text-emerald-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
+                            <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
+                            <path d="M12.5 0c-.157 0-.311.01-.462.03a1 1 0 0 0-.89.936V7.5a1 1 0 0 0 1 1h6.5a1 1 0 0 0 .947-.89A1 1 0 0 0 18.5 7 8.5 8.5 0 0 0 12.5 0Z"/>
+                        </svg>
+                        <span class="ms-3">Dashboard Overview</span>
+                    </a>
+                </li>
+
+                <!-- Section Core -->
+                <li class="pt-4 border-t border-gray-100">
+                    <span class="px-2 text-xs font-semibold text-gray-500 uppercase">🏛️ Core & Master</span>
+                </li>
+                <li>
+                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100" aria-controls="dropdown-core" data-collapse-toggle="dropdown-core">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                        <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Manajemen Data</span>
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/></svg>
+                    </button>
+                    <ul id="dropdown-core" class="hidden py-2 space-y-2">
+                        <li><a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg ps-11 group hover:bg-gray-100 text-sm">Profil Lembaga</a></li>
+                        <li><a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg ps-11 group hover:bg-gray-100 text-sm">Tahun Ajaran</a></li>
+                        <li><a href="#" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg ps-11 group hover:bg-gray-100 text-sm">Roles & Permission</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3.005 3.005 0 013.75-2.906z"></path></svg>
+                        <span class="ms-3">Master Santri</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                        <span class="ms-3">Pegawai (GTK)</span>
+                    </a>
+                </li>
+
+                <!-- Section Finance -->
+                <li class="pt-4 border-t border-gray-100">
+                    <span class="px-2 text-xs font-semibold text-gray-500 uppercase">💰 Finance</span>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"></path></svg>
+                        <span class="ms-3">Tagihan & Billing</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12 2a1 1 0 01.17.014c2.51.18 4.793 1.258 6.43 2.906a1 1 0 01-.17 1.637 10.972 10.972 0 00-6.43 2.906 1 1 0 01-1.637-.17 10.972 10.972 0 00-2.906-6.43 1 1 0 011.637-.17c1.648 1.648 2.726 3.93 2.906 6.43.014.17.17.17.17 0V2zm0 16a1 1 0 01-.17-.014c-2.51-.18-4.793-1.258-6.43-2.906a1 1 0 01.17-1.637 10.972 10.972 0 00 6.43-2.906 1 1 0 011.637.17 10.972 10.972 0 00 2.906 6.43 1 1 0 01-1.637.17c-1.648-1.648-2.726-3.93-2.906-6.43a1 1 0 01-.17 0v2z" clip-rule="evenodd"></path></svg>
+                        <span class="ms-3">Arus Kas</span>
+                    </a>
+                </li>
+
+                <!-- Section Academic -->
+                <li class="pt-4 border-t border-gray-100">
+                    <span class="px-2 text-xs font-semibold text-gray-500 uppercase">📚 Academic</span>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89l-.13-1.326a1 1 0 00-1.015-.939 4.107 4.107 0 01-1.902-.473l.601-.602z"></path></svg>
+                        <span class="ms-3">Kurikulum & Nilai</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
+                        <span class="ms-3">Buku Tahfidz</span>
+                    </a>
+                </li>
+
+                <!-- Section Admin -->
+                <li class="pt-4 border-t border-gray-100">
+                    <span class="px-2 text-xs font-semibold text-gray-500 uppercase">📊 Administrasi</span>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group">
+                        <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
+                        <span class="ms-3">Surat & Arsip</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="p-4 sm:ml-64 mt-14">
+        
+        <!-- Breadcrumbs -->
+        <nav class="flex px-5 py-3 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="#" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-emerald-600">
+                        <svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+                        </svg>
+                        Pusat
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                        </svg>
+                        <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2">Dashboard Overview</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 border-l-4 border-l-emerald-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Total Santri Aktif</p>
+                        <h3 class="text-2xl font-bold text-gray-900">1,245</h3>
+                    </div>
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-full">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a7 7 0 00-7 7v1h12v-1a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                </div>
+                <p class="text-xs text-emerald-600 mt-2 font-medium">↑ 12 Santri bulan ini</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 border-l-4 border-l-blue-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Pemasukan Hari Ini</p>
+                        <h3 class="text-2xl font-bold text-gray-900">Rp 12.5M</h3>
+                    </div>
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-full">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+                <p class="text-xs text-blue-600 mt-2 font-medium">Melalui Transfer & Cash</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 border-l-4 border-l-orange-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Pendaftar Baru (PSB)</p>
+                        <h3 class="text-2xl font-bold text-gray-900">342</h3>
+                    </div>
+                    <div class="p-3 bg-orange-50 text-orange-600 rounded-full">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-4">
+                    <div class="bg-orange-500 h-1.5 rounded-full" style="width: 65%"></div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 border-l-4 border-l-purple-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Absensi GTK Today</p>
+                        <h3 class="text-2xl font-bold text-gray-900">94.2%</h3>
+                    </div>
+                    <div class="p-3 bg-purple-50 text-purple-600 rounded-full">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                    </div>
+                </div>
+                <p class="text-xs text-purple-600 mt-2 font-medium">85 Hadir, 3 Izin, 2 Alpha</p>
+            </div>
+        </div>
+
+        <!-- Middle Section: Charts & Lists -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <!-- Revenue Chart -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <h5 class="text-lg font-bold text-gray-900">Statistik Keuangan (6 Bulan Terakhir)</h5>
+                    <button class="text-sm text-emerald-600 font-medium hover:underline">Detail Laporan</button>
+                </div>
+                <canvas id="revenueChart" height="120"></canvas>
+            </div>
+
+            <!-- Recent Activity / Logs -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h5 class="text-lg font-bold text-gray-900 mb-4">Log Aktivitas Terbaru</h5>
+                <div class="space-y-4">
+                    <div class="flex space-x-3">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-900"><span class="font-semibold">Pembayaran Diterima</span> - Santri Ahmad Fauzi (PPDT)</p>
+                            <p class="text-xs text-gray-500">2 menit yang lalu</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-900"><span class="font-semibold">PSB: Berkas Diverifikasi</span> - Nadia Ulfa (SMPPDT)</p>
+                            <p class="text-xs text-gray-500">15 menit yang lalu</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-900"><span class="font-semibold">Alert: Stok ATK Rendah</span> - Kantor Pusat</p>
+                            <p class="text-xs text-gray-500">1 jam yang lalu</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-900"><span class="font-semibold">Setoran Tahfidz Baru</span> - 12 Santri (MANUS)</p>
+                            <p class="text-xs text-gray-500">3 jam yang lalu</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="w-full mt-6 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition">Lihat Semua Aktivitas</button>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Quick Access & Table -->
+        <div class="grid grid-cols-1 gap-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                    <h5 class="text-lg font-bold text-gray-900">Daftar Lembaga & Unit</h5>
+                    <button class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition flex items-center">
+                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Tambah Unit
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 font-bold">Kode</th>
+                                <th scope="col" class="px-6 py-3 font-bold">Nama Lembaga</th>
+                                <th scope="col" class="px-6 py-3 font-bold">Jenjang</th>
+                                <th scope="col" class="px-6 py-3 font-bold">Santri Aktif</th>
+                                <th scope="col" class="px-6 py-3 font-bold">Status Keuangan</th>
+                                <th scope="col" class="px-6 py-3 font-bold">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-gray-900 uppercase">PPDT</td>
+                                <td class="px-6 py-4">Pondok Pesantren Dar Al Tauhid</td>
+                                <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">Non-Formal</span></td>
+                                <td class="px-6 py-4">850</td>
+                                <td class="px-6 py-4 text-emerald-600 font-semibold">Sehat</td>
+                                <td class="px-6 py-4">
+                                    <a href="#" class="font-medium text-blue-600 hover:underline">Manage</a>
+                                </td>
+                            </tr>
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-gray-900 uppercase">SMPPDT</td>
+                                <td class="px-6 py-4">SMP Plus Dar Al Tauhid</td>
+                                <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">Formal</span></td>
+                                <td class="px-6 py-4">240</td>
+                                <td class="px-6 py-4 text-emerald-600 font-semibold">Sehat</td>
+                                <td class="px-6 py-4">
+                                    <a href="#" class="font-medium text-blue-600 hover:underline">Manage</a>
+                                </td>
+                            </tr>
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-6 py-4 font-medium text-gray-900 uppercase">MANUS</td>
+                                <td class="px-6 py-4">MAS Nusantara Arjawinangun</td>
+                                <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">Formal</span></td>
+                                <td class="px-6 py-4">120</td>
+                                <td class="px-6 py-4 text-orange-500 font-semibold">Review</td>
+                                <td class="px-6 py-4">
+                                    <a href="#" class="font-medium text-blue-600 hover:underline">Manage</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 py-6 border-t border-gray-200 text-center">
+            <p class="text-sm text-gray-500">© 2026 Yayasan Dar Al Tauhid Pusat. Powered by IT Dar Al Tauhid.</p>
+        </footer>
+    </div>
+
+    <!-- Flowbite JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+    
+    <!-- Chart Logic -->
+    <script>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Agu', 'Sep', 'Okt', 'Nov', 'Des', 'Jan'],
+                datasets: [
+                    {
+                        label: 'Pemasukan (Santri)',
+                        data: [450, 520, 480, 610, 580, 750],
+                        borderColor: '#057a55',
+                        backgroundColor: 'rgba(5, 122, 85, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Pengeluaran (Operasional)',
+                        data: [300, 280, 320, 350, 400, 380],
+                        borderColor: '#dc2626',
+                        backgroundColor: 'transparent',
+                        fill: false,
+                        tension: 0.4,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value + 'jt';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
