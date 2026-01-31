@@ -1,4 +1,4 @@
-# Tabel Core & System
+# 1. Tabel Core & System
 
 ## 1.1 `institutions` - Data Lembaga
 

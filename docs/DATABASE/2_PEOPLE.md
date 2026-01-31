@@ -1,4 +1,4 @@
-## Tabel Data Master (People)
+## 2. Tabel Data Master (People)
 
 ### 2.1 `students` - Data Santri
 
