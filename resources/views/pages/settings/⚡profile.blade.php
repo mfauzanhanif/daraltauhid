@@ -79,29 +79,38 @@ new class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <flux:heading class="sr-only">{{ __('Profile Settings') }}</flux:heading>
+    <h1 class="sr-only">{{ __('Pengaturan Profil') }}</h1>
 
-    <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
+    <x-pages::settings.layout :heading="__('Profil')" :subheading="__('Perbarui nama dan alamat email Anda')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
+            <div>
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Nama') }}</label>
+                <input type="text" wire:model="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" required autofocus autocomplete="name">
+                @error('name')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
+            </div>
 
             <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __('Email') }}</label>
+                <input type="email" wire:model="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" required autocomplete="email">
+                @error('email')
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+                @enderror
 
                 @if ($this->hasUnverifiedEmail)
                     <div>
-                        <flux:text class="mt-4">
-                            {{ __('Your email address is unverified.') }}
-
-                            <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
-                                {{ __('Click here to re-send the verification email.') }}
-                            </flux:link>
-                        </flux:text>
+                        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                            {{ __('Alamat email Anda belum terverifikasi.') }}
+                            <button type="button" wire:click.prevent="resendVerificationNotification" class="text-sm text-emerald-600 hover:underline dark:text-emerald-500 cursor-pointer">
+                                {{ __('Klik di sini untuk mengirim ulang email verifikasi.') }}
+                            </button>
+                        </p>
 
                         @if (session('status') === 'verification-link-sent')
-                            <flux:text class="mt-2 font-medium !dark:text-green-400 !text-green-600">
-                                {{ __('A new verification link has been sent to your email address.') }}
-                            </flux:text>
+                            <p class="mt-2 font-medium text-emerald-600 dark:text-emerald-400">
+                                {{ __('Email verifikasi baru telah dikirim ke alamat email Anda.') }}
+                            </p>
                         @endif
                     </div>
                 @endif
@@ -109,12 +118,12 @@ new class extends Component {
 
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
+                    <button type="submit" class="text-white bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-emerald-600 dark:hover:bg-emerald-700 focus:outline-none dark:focus:ring-emerald-800" data-test="update-profile-button">
                         {{ __('Save') }}
-                    </flux:button>
+                    </button>
                 </div>
 
-                <x-action-message class="me-3" on="profile-updated">
+                <x-action-message class="me-3 text-emerald-600 dark:text-emerald-400" on="profile-updated">
                     {{ __('Saved.') }}
                 </x-action-message>
             </div>
