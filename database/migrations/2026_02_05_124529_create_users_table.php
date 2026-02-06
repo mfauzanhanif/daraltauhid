@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            
+
             // Fortify 2FA Fields
             $table->text('two_factor_secret')->nullable();
             $table->text('two_factor_recovery_codes')->nullable();
@@ -74,7 +74,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['name', 'guard_name']);
-            
+
             // Index as per documentation
             $table->index('name');
         });
@@ -82,12 +82,14 @@ return new class extends Migration
         // Tabel Roles (CUSTOM: With Institution ID)
         Schema::create($tableNames['roles'], function (Blueprint $table) use ($columnNames) {
             $table->bigIncrements('id');
-            
-            // Custom Column: Institution ID
-            // Pastikan tabel 'institutions' sudah dibuat sebelum migrasi ini jalan!
+
+            // Custom Column: Institution ID (Nullable untuk Global Roles)
+            // NULL = Role global (Super Admin Platform, IT Support, dll)
+            // NOT NULL = Role khusus institusi tertentu
             $table->foreignId('institution_id')
-                  ->constrained('institutions')
-                  ->cascadeOnDelete();
+                ->nullable() // Izinkan role global
+                ->constrained('institutions')
+                ->cascadeOnDelete();
 
             $table->string('name');       // For MySQL 8.0 use string('name', 125);
             $table->string('guard_name'); // For MySQL 8.0 use string('guard_name', 125);
@@ -95,7 +97,7 @@ return new class extends Migration
 
             // Custom Unique: Institution + Name + Guard
             $table->unique(['institution_id', 'name', 'guard_name']);
-            
+
             // Indexes as per documentation
             $table->index('institution_id');
             $table->index('name');
@@ -113,8 +115,10 @@ return new class extends Migration
                 ->on($tableNames['permissions'])
                 ->cascadeOnDelete();
 
-            $table->primary([$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
-                'model_has_permissions_permission_model_type_primary');
+            $table->primary(
+                [$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                'model_has_permissions_permission_model_type_primary'
+            );
         });
 
         // Tabel Model Has Roles
@@ -129,8 +133,10 @@ return new class extends Migration
                 ->on($tableNames['roles'])
                 ->cascadeOnDelete();
 
-            $table->primary([$pivotRole, $columnNames['model_morph_key'], 'model_type'],
-                'model_has_roles_role_model_type_primary');
+            $table->primary(
+                [$pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                'model_has_roles_role_model_type_primary'
+            );
         });
 
         // Tabel Role Has Permissions

@@ -10,6 +10,8 @@ class CheckInstitutionAccess
 {
     /**
      * Handle an incoming request.
+     * Middleware ini mengecek apakah User boleh masuk ke institusi
+     * yang sudah ditemukan oleh middleware SetCurrentInstitution.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
@@ -17,24 +19,24 @@ class CheckInstitutionAccess
     {
         $user = $request->user();
 
-        // If user is global admin, bypass check
+        // 1. Jika User Global Admin (Yayasan), izinkan masuk ke mana saja
         if ($user && $user->isGlobalAdmin()) {
             return $next($request);
         }
 
-        // Get institution ID from route parameter 'institution' (if resource route)
-        // or query parameter 'institution_id'
-        $institutionId = $request->route('institution')?->id
-            ?? $request->route('institution')
-            ?? $request->input('institution_id');
+        // 2. Ambil institusi dari konteks (hasil kerja SetCurrentInstitution)
+        if (app()->bound('current_institution')) {
+            $institution = app('current_institution');
 
-        // Logic:
-        // 1. If no institution context is required (null), proceed.
-        // 2. If institution is specified, check if user has role in it.
-
-        if ($institutionId) {
-            if (! $user->hasRoleInInstitution($institutionId)) {
-                abort(403, 'Anda tidak memiliki akses ke lembaga ini.');
+            // 3. Cek apakah user punya role di institusi ini
+            // Menggunakan method yang sudah ada di User.php
+            if (! $user || ! $user->hasRoleInInstitution($institution->id)) {
+                // Jika request JSON/Inertia, return 403
+                if ($request->wantsJson()) {
+                    abort(403, 'Anda tidak terdaftar sebagai staf di lembaga ini.');
+                }
+                // Jika akses web biasa, abort dengan pesan
+                abort(403, 'Akses Ditolak: Anda bukan staf ' . $institution->nickname);
             }
         }
 

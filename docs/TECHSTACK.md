@@ -37,3 +37,4 @@
 ## Library
 
 - nwidart/laravel-modules
+- spatie/laravel-permission

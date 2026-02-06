@@ -15,30 +15,29 @@ class LoginResponse implements LoginResponseContract
      */
     public function toResponse($request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
-
-        // Check if global admin
-        if ($user->isGlobalAdmin()) {
-            return redirect()->intended(config('fortify.home'));
-        }
-
         $institutions = $user->getInstitutions();
 
-        // If user has roles in multiple institutions, redirect to selector
+        // Global Admin: redirect ke halaman select institution
+        if ($user->isGlobalAdmin()) {
+            return redirect()->route('institution.select');
+        }
+
+        // User dengan banyak institusi: redirect ke halaman select
         if ($institutions->count() > 1) {
             return redirect()->route('institution.select');
         }
 
-        // If user has role in only one institution, redirect there (or to dashboard with context)
-        // For now, let's just go to dashboard, but ideally we'd set the current institution in session
+        // User dengan 1 institusi: auto-set session dan redirect ke dashboard
         if ($institutions->count() === 1) {
             $institution = $institutions->first();
-            // Optionally set session here
-            // session(['current_institution_id' => $institution->id]);
+            session(['current_institution_id' => $institution->id]);
+
             return redirect()->intended(config('fortify.home'));
         }
 
-        // Default fallback
+        // User tanpa institusi (seharusnya tidak terjadi)
         return redirect()->intended(config('fortify.home'));
     }
 }

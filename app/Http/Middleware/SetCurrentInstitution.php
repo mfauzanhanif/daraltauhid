@@ -11,26 +11,34 @@ class SetCurrentInstitution
 {
     /**
      * Handle an incoming request.
+     * Middleware ini menentukan institusi aktif dari session atau domain.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Check if domain mapping determines institution
-        $host = $request->getHost();
-        $institution = Institution::findByDomain($host);
+        $institution = null;
 
-        if ($institution) {
-            // Set in session or container
-            session(['current_institution' => $institution]);
-            // Also share with Inertia if needed, usually done in HandleInertiaRequests
-            return $next($request);
+        // 1. Prioritas: Ambil dari session (user sudah pilih institusi)
+        if (session()->has('current_institution_id')) {
+            $institutionId = session('current_institution_id');
+            $institution = cache()->remember("institution_{$institutionId}", 3600, function () use ($institutionId) {
+                return Institution::find($institutionId);
+            });
         }
 
-        // 2. Fallback: Check session for manually selected institution
-        // This is set when user logs in and selects an institution
-        // OR when user switches institution via UI
-        // if (session()->has('current_institution_id')) { ... }
+        // 2. Fallback: Coba cari dari domain (untuk landing pages)
+        if (! $institution) {
+            $host = $request->getHost();
+            $institution = cache()->remember("domain_mapping_{$host}", 3600, function () use ($host) {
+                return Institution::findByDomain($host);
+            });
+        }
+
+        // 3. Simpan ke Service Container jika ketemu
+        if ($institution) {
+            app()->instance('current_institution', $institution);
+        }
 
         return $next($request);
     }

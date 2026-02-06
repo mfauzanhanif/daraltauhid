@@ -124,7 +124,7 @@ class InstitutionController extends Controller
         foreach ($institutions as $institution) {
             if ($institution->parent_id == $parentId) {
                 $children = $this->buildTree($institutions, $institution->id);
-                
+
                 $node = [
                     'id' => $institution->id,
                     'name' => $institution->name,
@@ -144,5 +144,54 @@ class InstitutionController extends Controller
         }
 
         return $branch;
+    }
+
+    /**
+     * Show institution selection page (after login).
+     */
+    public function select(Request $request)
+    {
+        $user = $request->user();
+
+        // Get institutions based on user type
+        if ($user->isGlobalAdmin()) {
+            $institutions = Institution::where('is_active', true)
+                ->orderBy('name')
+                ->get();
+        } else {
+            $institutions = $user->getInstitutions();
+        }
+
+        return Inertia::render('auth/select-institution', [
+            'institutions' => $institutions,
+        ]);
+    }
+
+    /**
+     * Switch to a different institution (store in session).
+     */
+    public function switch(Request $request)
+    {
+        $request->validate([
+            'institution_id' => 'required|exists:institutions,id',
+        ]);
+
+        $user = $request->user();
+        $institutionId = $request->input('institution_id');
+
+        // Verify user has access to this institution
+        $hasAccess = $user->isGlobalAdmin() || $user->hasRoleInInstitution($institutionId);
+
+        if (! $hasAccess) {
+            abort(403, 'Anda tidak memiliki akses ke lembaga ini.');
+        }
+
+        // Store in session
+        session(['current_institution_id' => $institutionId]);
+
+        // Clear cache for current institution
+        cache()->forget("institution_{$institutionId}");
+
+        return redirect()->route('dashboard');
     }
 }
