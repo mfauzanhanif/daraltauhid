@@ -1,0 +1,96 @@
+# ----------------------------------------------
+# 1. GLOBAL & SYSTEM FILES (Berlaku untuk semua)
+# ----------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+*.swp
+.env
+
+# ----------------------------------------------
+# 2. WEB APP (Laravel 12)
+# ----------------------------------------------
+web/vendor
+web/node_modules
+web/npm-debug.log
+web/yarn-error.log
+
+# Laravel Environment
+web/.env
+web/auth.json
+
+# Laravel Build & Public
+web/public/hot
+web/public/storage
+web/public/build
+
+# Laravel Storage & Cache (PENTING: Jangan commit cache server)
+web/storage/*.key
+web/storage/app/public
+web/storage/framework/cache/data/*
+web/storage/framework/sessions/*
+web/storage/framework/testing/*
+web/storage/framework/views/*
+web/storage/logs/*
+!web/storage/app/public/.gitignore
+!web/storage/framework/cache/data/.gitignore
+!web/storage/framework/sessions/.gitignore
+!web/storage/framework/testing/.gitignore
+!web/storage/framework/views/.gitignore
+!web/storage/logs/.gitignore
+
+# PHPUnit
+web/.phpunit.cache
+web/.phpunit.result.cache
+
+# Ziggy / Auto-generated JS
+web/resources/js/actions
+web/resources/js/routes
+web/resources/js/wayfinder
+
+# Editor/IDE specific in Web
+web/.fleet
+web/.idea
+web/.nova
+web/.vscode
+web/.zed
+web/.phpactor.json
+
+# ----------------------------------------------
+# 3. MOBILE APP (Expo)
+# ----------------------------------------------
+mobile/node_modules
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+
+# Expo Environment
+mobile/.env
+mobile/.env.local
+mobile/.env.*.local
+
+# Native Builds (Prebuild Strategy - Keep this ignored!)
+# Jika Anda butuh custom native code, hapus baris ini nanti.
+mobile/ios/
+mobile/android/
+
+# Keystores & Secrets (SANGAT PENTING)
+mobile/*.jks
+mobile/*.keystore
+mobile/*.p8
+mobile/*.p12
+mobile/*.key
+mobile/*.mobileprovision
+mobile/*.pem
+
+# Metro & Debug
+mobile/.metro-health-check*
+mobile/npm-debug.*
+mobile/yarn-debug.*
+mobile/yarn-error.*
+mobile/*.tsbuildinfo
+
+# Template files
+mobile/app-example
