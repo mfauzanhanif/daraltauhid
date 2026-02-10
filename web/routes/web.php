@@ -180,3 +180,15 @@ Route::domain(env('APP_DOMAIN'))->group(function () {
 // Route::domain('sarung.' . env('MAIN_DOMAIN', 'daraltauhid.com'))->group(function () {
 //     // News/Berita Routes
 // });
+
+/*
+|--------------------------------------------------------------------------
+| PPDT / LANDING PAGE (daraltauhid.com)
+|--------------------------------------------------------------------------
+*/
+
+Route::domain(env('PPDT_DOMAIN', 'daraltauhid.com'))->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Home')->setRootView('ppdt');
+    })->name('ppdt.home');
+});
