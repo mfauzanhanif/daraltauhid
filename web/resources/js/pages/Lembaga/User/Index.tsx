@@ -1,0 +1,165 @@
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Users, Plus, MoreHorizontal, Pencil, Trash2, Search, Mail, Shield } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, SharedData } from '@/types';
+
+type User = {
+    id: number;
+    name: string;
+    email: string;
+    avatar_url?: string;
+    roles: { name: string; display_name: string }[];
+};
+
+type Props = {
+    users: User[];
+    institutionCode: string;
+};
+
+export default function LembagaUserIndex({ users = [], institutionCode }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: currentPortal?.name || 'Lembaga', href: currentPortal?.dashboardUrl || '/' },
+        { title: 'Pengguna', href: `/${institutionCode}/users` },
+    ];
+
+    const getInitials = (name: string) => {
+        return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Pengguna Lembaga" />
+
+            <div className="flex flex-col gap-6 p-6">
+                {/* Header */}
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex size-12 items-center justify-center rounded-xl bg-cyan-100 dark:bg-cyan-900/30">
+                            <Users className="size-6 text-cyan-600" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold">Pengguna Lembaga</h1>
+                            <p className="text-muted-foreground">Kelola pengguna yang memiliki akses ke lembaga ini</p>
+                        </div>
+                    </div>
+                    <Button asChild>
+                        <Link href={`/${institutionCode}/users/create`}>
+                            <Plus className="mr-2 size-4" />
+                            Tambah Pengguna
+                        </Link>
+                    </Button>
+                </div>
+
+                {/* Search */}
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                            <Input placeholder="Cari pengguna..." className="pl-9" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Table */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Daftar Pengguna ({users.length})</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Nama</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Role di Lembaga</TableHead>
+                                    <TableHead className="w-[80px]"></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {users.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                                            Belum ada pengguna di lembaga ini
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    users.map((user) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar className="size-9">
+                                                        <AvatarImage src={user.avatar_url} />
+                                                        <AvatarFallback className="text-xs">{getInitials(user.name)}</AvatarFallback>
+                                                    </Avatar>
+                                                    <span className="font-medium">{user.name}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                <div className="flex items-center gap-2">
+                                                    <Mail className="size-4" />
+                                                    {user.email}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles.map((role) => (
+                                                        <Badge key={role.name} variant="outline">
+                                                            <Shield className="mr-1 size-3" />
+                                                            {role.display_name}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon">
+                                                            <MoreHorizontal className="size-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/${institutionCode}/users/${user.id}/edit`}>
+                                                                <Pencil className="mr-2 size-4" />
+                                                                Edit Role
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-destructive">
+                                                            <Trash2 className="mr-2 size-4" />
+                                                            Hapus Akses
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
+        </AppLayout>
+    );
+}

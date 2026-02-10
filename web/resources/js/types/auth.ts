@@ -10,8 +10,34 @@ export type User = {
     [key: string]: unknown;
 };
 
+export type PortalInstitution = {
+    id: number;
+    code: string;
+    name: string;
+    type: string;
+    url: string;
+};
+
+export type PortalStudent = {
+    id: number;
+    public_id: string;
+    name: string;
+    url: string;
+};
+
+export type AvailablePortals = {
+    institutions?: PortalInstitution[];
+    students?: PortalStudent[];
+    admin?: {
+        name: string;
+        url: string;
+    };
+};
+
 export type Auth = {
     user: User;
+    roles?: string[];
+    available_portals?: AvailablePortals;
 };
 
 export type TwoFactorSetupData = {

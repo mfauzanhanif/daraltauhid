@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Root Institution Code
+    |--------------------------------------------------------------------------
+    |
+    | Kode institution induk (Yayasan) yang digunakan sebagai default
+    | dashboard untuk Global Admin. Diambil dari kolom `code` pada
+    | tabel institutions.
+    |
+    */
+
+    'root_institution_code' => env('ROOT_INSTITUTION_CODE', 'YDTP'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

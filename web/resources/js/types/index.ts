@@ -4,9 +4,17 @@ export type * from './ui';
 
 import type { Auth } from './auth';
 
+export type CurrentPortal = {
+    type: 'institution' | 'admin' | 'wali';
+    code: string;
+    name: string;
+    dashboardUrl: string;
+} | null;
+
 export type SharedData = {
     name: string;
     auth: Auth;
     sidebarOpen: boolean;
+    currentPortal: CurrentPortal;
     [key: string]: unknown;
 };
