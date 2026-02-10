@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -124,7 +125,7 @@ class Institution extends Model
     /**
      * Scope a query to only include active institutions.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -132,7 +133,7 @@ class Institution extends Model
     /**
      * Scope a query to only include internal institutions.
      */
-    public function scopeInternal($query)
+    public function scopeInternal(Builder $query): Builder
     {
         return $query->where('is_internal', true);
     }
@@ -140,7 +141,7 @@ class Institution extends Model
     /**
      * Scope a query to filter by category.
      */
-    public function scopeCategory($query, string $category)
+    public function scopeCategory(Builder $query, string $category): Builder
     {
         return $query->where('category', $category);
     }
@@ -148,7 +149,7 @@ class Institution extends Model
     /**
      * Scope a query to filter by type.
      */
-    public function scopeType($query, string $type)
+    public function scopeType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
     }
@@ -156,7 +157,7 @@ class Institution extends Model
     /**
      * Scope a query to only include external institutions.
      */
-    public function scopeExternal($query)
+    public function scopeExternal(Builder $query): Builder
     {
         return $query->where('is_internal', false);
     }
@@ -164,7 +165,7 @@ class Institution extends Model
     /**
      * Scope a query to filter by domain.
      */
-    public function scopeByDomain($query, string $domain)
+    public function scopeByDomain(Builder $query, string $domain): Builder
     {
         return $query->where('domain', $domain);
     }
@@ -172,7 +173,7 @@ class Institution extends Model
     /**
      * Scope a query to filter by code.
      */
-    public function scopeByCode($query, string $code)
+    public function scopeByCode(Builder $query, string $code): Builder
     {
         return $query->where('code', $code);
     }

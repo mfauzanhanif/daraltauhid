@@ -64,7 +64,6 @@ class HandleInertiaRequests extends Middleware
                 'type' => $currentInstitution->type,
                 'category' => $currentInstitution->category,
                 'logo_path' => $currentInstitution->logo_path,
-                'theme_color' => $currentInstitution->theme_color ?? null,
                 'active_academic_year_id' => $currentInstitution->active_academic_year_id ?? null,
             ] : null,
 
@@ -111,6 +110,7 @@ class HandleInertiaRequests extends Middleware
                 'code' => $institution->code,
                 'name' => $institution->nickname ?? $institution->name,
                 'dashboardUrl' => "/{$institution->code}/dashboard",
+                'is_root' => $institution->code === root_institution_code(),
             ];
         }
 

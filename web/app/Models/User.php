@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -64,7 +65,7 @@ class User extends Authenticatable
      * Get all institutions this user has roles in.
      * Returns a collection of Institution models.
      */
-    public function getInstitutions()
+    public function getInstitutions(): Collection
     {
         return Institution::whereIn(
             'id',
@@ -104,7 +105,7 @@ class User extends Authenticatable
      * Get all roles for a specific institution.
      * If null is passed, returns global roles (roles without institution).
      */
-    public function getRolesInInstitution(int|Institution|null $institution)
+    public function getRolesInInstitution(int|Institution|null $institution): Collection
     {
         // Jika null, return global roles
         if ($institution === null) {
@@ -183,7 +184,7 @@ class User extends Authenticatable
     /**
      * Get all students this user is guardian of.
      */
-    public function getStudents()
+    public function getStudents(): Collection
     {
         // @todo: Implement when Student model is ready
         // return $this->belongsToMany(Student::class, 'student_guardians')

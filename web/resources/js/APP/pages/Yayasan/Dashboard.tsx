@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Building2, Users, BookOpen, DollarSign, Package, Settings, Shield, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import AppLayout from '@/APP/layouts/app-layout';
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
                     <CardContent>
                         <div className="grid gap-4 md:grid-cols-2">
                             {adminLinks.map((link) => (
-                                <a
+                                <Link
                                     key={link.title}
                                     href={link.href}
                                     className="flex items-start gap-4 rounded-xl border p-4 transition-all hover:bg-muted/50 hover:shadow-sm"
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
                                         <div className="font-semibold">{link.title}</div>
                                         <div className="text-sm text-muted-foreground">{link.desc}</div>
                                     </div>
-                                </a>
+                                </Link>
                             ))}
                         </div>
                     </CardContent>

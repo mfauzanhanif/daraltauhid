@@ -2,30 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class AcademicYear extends Model
 {
     use HasFactory, SoftDeletes;
-
-    /**
-     * The "booted" method of the model.
-     * Enforce constraint: hanya satu tahun ajaran yang aktif dalam satu waktu.
-     */
-    protected static function booted(): void
-    {
-        static::saving(function (AcademicYear $year) {
-            if ($year->is_active) {
-                // Nonaktifkan semua tahun ajaran lain yang aktif
-                static::where('id', '!=', $year->id ?? 0)
-                    ->where('is_active', true)
-                    ->update(['is_active' => false]);
-            }
-        });
-    }
 
     /**
      * The attributes that are mass assignable.
@@ -64,7 +50,7 @@ class AcademicYear extends Model
     /**
      * Scope a query to only include active academic year.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -82,10 +68,15 @@ class AcademicYear extends Model
      */
     public function setAsActive(): void
     {
-        // Deactivate all other academic years
-        static::where('id', '!=', $this->id)->update(['is_active' => false]);
+        DB::transaction(function () {
+            // Lock semua row untuk mencegah race condition
+            static::query()->lockForUpdate()->get();
 
-        // Activate this one
-        $this->update(['is_active' => true]);
+            // Deactivate semua tahun ajaran lain
+            static::where('id', '!=', $this->id)->update(['is_active' => false]);
+
+            // Activate yang ini
+            $this->update(['is_active' => true]);
+        });
     }
 }

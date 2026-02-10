@@ -131,8 +131,8 @@ export function AppSidebar() {
 
         switch (currentPortal.type) {
             case 'institution':
-                // Check if it is the Yayasan (YDTP)
-                if (currentPortal.code === 'YDTP') {
+                // Check if it is the root institution (Yayasan)
+                if (currentPortal.is_root) {
                     return getYayasanMenuItems(currentPortal.code);
                 }
                 return getLembagaMenuItems(currentPortal.code);

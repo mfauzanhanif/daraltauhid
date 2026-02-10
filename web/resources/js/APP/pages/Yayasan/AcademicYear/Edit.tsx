@@ -7,34 +7,46 @@ import { Label } from '@/shared/ui/label';
 import { Switch } from '@/shared/ui/switch';
 import AppLayout from '@/APP/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { index as academicYearsIndex, create as academicYearsCreate, store as academicYearsStore } from '@/routes/academic-years';
+import { index as academicYearsIndex, edit as academicYearsEdit, update as academicYearsUpdate } from '@/routes/academic-years';
 import { dashboard } from '@/routes/portal';
 
-export default function AcademicYearCreate() {
+type AcademicYear = {
+    id: number;
+    name: string;
+    start_date: string;
+    end_date: string;
+    is_active: boolean;
+};
+
+type Props = {
+    academicYear: AcademicYear;
+};
+
+export default function AcademicYearEdit({ academicYear }: Props) {
     const { currentPortal } = usePage<SharedData>().props;
     const code = currentPortal?.code ?? '';
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin Yayasan', href: dashboard.url(code) },
         { title: 'Tahun Ajaran', href: academicYearsIndex.url(code) },
-        { title: 'Tambah', href: academicYearsCreate.url(code) },
+        { title: 'Edit', href: academicYearsEdit.url({ institution: code, academic_year: academicYear.id }) },
     ];
 
-    const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        start_date: '',
-        end_date: '',
-        is_active: false,
+    const { data, setData, put, processing, errors } = useForm({
+        name: academicYear.name,
+        start_date: academicYear.start_date,
+        end_date: academicYear.end_date,
+        is_active: academicYear.is_active,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(academicYearsStore.url(code));
+        put(academicYearsUpdate.url({ institution: code, academic_year: academicYear.id }));
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tambah Tahun Ajaran" />
+            <Head title={`Edit - ${academicYear.name}`} />
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
@@ -43,8 +55,8 @@ export default function AcademicYearCreate() {
                         <Calendar className="size-6 text-blue-600" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold">Tambah Tahun Ajaran</h1>
-                        <p className="text-muted-foreground">Buat tahun ajaran baru</p>
+                        <h1 className="text-2xl font-bold">Edit Tahun Ajaran</h1>
+                        <p className="text-muted-foreground">{academicYear.name}</p>
                     </div>
                 </div>
 
@@ -111,7 +123,7 @@ export default function AcademicYearCreate() {
                                 <CardContent className="pt-6">
                                     <div className="flex flex-col gap-2">
                                         <Button type="submit" disabled={processing}>
-                                            {processing ? 'Menyimpan...' : 'Simpan'}
+                                            {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                                         </Button>
                                         <Button variant="outline" asChild>
                                             <Link href={academicYearsIndex.url(code)}>Batal</Link>

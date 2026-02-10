@@ -1,13 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import AppLogoIcon from '@/APP/components/app-logo-icon';
 import { home } from '@/routes';
-import type { SharedData } from '@/types';
-
-interface AuthLayoutProps {
-    children: React.ReactNode;
-    title: string;
-    description: string;
-}
+import type { AuthLayoutProps, SharedData } from '@/types';
 
 export default function AuthLayout({ children, title, description }: AuthLayoutProps) {
     const { name } = usePage<SharedData>().props;
@@ -19,12 +13,12 @@ export default function AuthLayout({ children, title, description }: AuthLayoutP
                     <AppLogoIcon className="h-10 text-emerald-600 dark:text-emerald-400" />
                     <span className="text-xl font-bold text-slate-900 dark:text-slate-100">{name}</span>
                 </Link>
-                
+
                 <div className="text-center space-y-2">
                     <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">{title}</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
                 </div>
-                
+
                 {children}
             </div>
         </div>

@@ -16,7 +16,9 @@ class LoginResponse implements LoginResponseContract
     public function toResponse($request)
     {
         $user = Auth::user();
-        $loginType = $request->input('login_type', 'staff');
+        $loginType = in_array($request->input('login_type'), ['staff', 'wali'], true)
+            ? $request->input('login_type')
+            : 'staff';
 
         // Store login type in session for reference
         session(['login_type' => $loginType]);

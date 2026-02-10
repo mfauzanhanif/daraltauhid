@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Building2, Users, BookOpen, DollarSign, Package, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import AppLayout from '@/APP/layouts/app-layout';
@@ -88,14 +88,14 @@ export default function PortalDashboard({ institution }: Props) {
                     <CardContent>
                         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                             {quickLinks.map((link) => (
-                                <a
+                                <Link
                                     key={link.title}
                                     href={link.href}
                                     className="flex items-center gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
                                 >
                                     <link.icon className="size-5 text-muted-foreground" />
                                     <span className="font-medium">{link.title}</span>
-                                </a>
+                                </Link>
                             ))}
                         </div>
                     </CardContent>

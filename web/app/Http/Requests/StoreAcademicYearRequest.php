@@ -11,7 +11,7 @@ class StoreAcademicYearRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // TODO: Add authorization logic
+        return $this->user()?->isGlobalAdmin() ?? false;
     }
 
     /**

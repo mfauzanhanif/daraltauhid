@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Shield, Plus, MoreHorizontal, Pencil, Trash2, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -18,12 +18,9 @@ import {
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin Yayasan', href: '/admin/dashboard' },
-    { title: 'Role', href: '/admin/roles' },
-];
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as rolesIndex, create as rolesCreate, edit as rolesEdit } from '@/routes/institution/roles';
+import { dashboard } from '@/routes/portal';
 
 type Role = {
     id: number;
@@ -41,6 +38,14 @@ type Props = {
 };
 
 export default function RoleIndex({ roles = [] }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Role', href: rolesIndex.url(code) },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manajemen Role" />
@@ -58,7 +63,7 @@ export default function RoleIndex({ roles = [] }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href="/admin/roles/create">
+                        <Link href={rolesCreate.url(code)}>
                             <Plus className="mr-2 size-4" />
                             Tambah Role
                         </Link>
@@ -120,7 +125,7 @@ export default function RoleIndex({ roles = [] }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/roles/${role.id}/edit`}>
+                                                            <Link href={rolesEdit.url({ institution: code, role: role.id })}>
                                                                 <Pencil className="mr-2 size-4" />
                                                                 Edit
                                                             </Link>

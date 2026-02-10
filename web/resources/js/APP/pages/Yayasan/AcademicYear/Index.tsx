@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Calendar, Plus, MoreHorizontal, Pencil, Trash2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -18,12 +18,9 @@ import {
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin Yayasan', href: '/admin/dashboard' },
-    { title: 'Tahun Ajaran', href: '/admin/academic-years' },
-];
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as academicYearsIndex, create as academicYearsCreate, edit as academicYearsEdit } from '@/routes/academic-years';
+import { dashboard } from '@/routes/portal';
 
 type AcademicYear = {
     id: number;
@@ -38,6 +35,14 @@ type Props = {
 };
 
 export default function AcademicYearIndex({ academicYears = [] }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Tahun Ajaran', href: academicYearsIndex.url(code) },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tahun Ajaran" />
@@ -55,7 +60,7 @@ export default function AcademicYearIndex({ academicYears = [] }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href="/admin/academic-years/create">
+                        <Link href={academicYearsCreate.url(code)}>
                             <Plus className="mr-2 size-4" />
                             Tambah Tahun Ajaran
                         </Link>
@@ -110,7 +115,7 @@ export default function AcademicYearIndex({ academicYears = [] }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/academic-years/${year.id}/edit`}>
+                                                            <Link href={academicYearsEdit.url({ institution: code, academic_year: year.id })}>
                                                                 <Pencil className="mr-2 size-4" />
                                                                 Edit
                                                             </Link>

@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { BookOpen, Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -18,12 +18,9 @@ import {
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin Yayasan', href: '/admin/dashboard' },
-    { title: 'Semester', href: '/admin/semesters' },
-];
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as semestersIndex, create as semestersCreate, edit as semestersEdit } from '@/routes/semesters';
+import { dashboard } from '@/routes/portal';
 
 type Semester = {
     id: number;
@@ -40,6 +37,14 @@ type Props = {
 };
 
 export default function SemesterIndex({ semesters = [] }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Semester', href: semestersIndex.url(code) },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Semester" />
@@ -57,7 +62,7 @@ export default function SemesterIndex({ semesters = [] }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href="/admin/semesters/create">
+                        <Link href={semestersCreate.url(code)}>
                             <Plus className="mr-2 size-4" />
                             Tambah Semester
                         </Link>
@@ -115,7 +120,7 @@ export default function SemesterIndex({ semesters = [] }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/semesters/${semester.id}/edit`}>
+                                                            <Link href={semestersEdit.url({ institution: code, semester: semester.id })}>
                                                                 <Pencil className="mr-2 size-4" />
                                                                 Edit
                                                             </Link>

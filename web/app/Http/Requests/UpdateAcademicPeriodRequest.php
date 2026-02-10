@@ -12,7 +12,7 @@ class UpdateAcademicPeriodRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // TODO: Add authorization logic
+        return $this->user()?->isGlobalAdmin() ?? false;
     }
 
     /**
@@ -37,7 +37,7 @@ class UpdateAcademicPeriodRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $periodId = $this->route('academic_period')->id;
+            $periodId = $this->route('academic_period')?->id;
             
             $exists = \App\Models\AcademicPeriod::where('academic_year_id', $this->academic_year_id)
                 ->where('name', $this->name)

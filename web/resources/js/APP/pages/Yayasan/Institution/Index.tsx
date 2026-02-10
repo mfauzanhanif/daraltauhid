@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Building2, Plus, Search, MoreHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -19,12 +19,9 @@ import {
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin Yayasan', href: '/admin/dashboard' },
-    { title: 'Lembaga', href: '/admin/institutions' },
-];
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as institutionsIndex, create as institutionsCreate, show as institutionsShow, edit as institutionsEdit } from '@/routes/institutions';
+import { dashboard } from '@/routes/portal';
 
 type Institution = {
     id: number;
@@ -41,6 +38,14 @@ type Props = {
 };
 
 export default function InstitutionIndex({ institutions = [] }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Lembaga', href: institutionsIndex.url(code) },
+    ];
+
     const getTypeBadge = (type: string) => {
         const colors: Record<string, string> = {
             'PONDOK': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
@@ -68,7 +73,7 @@ export default function InstitutionIndex({ institutions = [] }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href="/admin/institutions/create">
+                        <Link href={institutionsCreate.url(code)}>
                             <Plus className="mr-2 size-4" />
                             Tambah Lembaga
                         </Link>
@@ -147,13 +152,13 @@ export default function InstitutionIndex({ institutions = [] }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/institutions/${institution.id}`}>
+                                                            <Link href={institutionsShow.url({ institution: code, inst: institution.id })}>
                                                                 <Eye className="mr-2 size-4" />
                                                                 Lihat Detail
                                                             </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/institutions/${institution.id}/edit`}>
+                                                            <Link href={institutionsEdit.url({ institution: code, inst: institution.id })}>
                                                                 <Pencil className="mr-2 size-4" />
                                                                 Edit
                                                             </Link>

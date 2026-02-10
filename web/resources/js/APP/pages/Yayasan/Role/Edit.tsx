@@ -15,12 +15,11 @@ import {
 } from '@/shared/ui/select';
 import AppLayout from '@/APP/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { index as rolesIndex, create as rolesCreate, store as rolesStore } from '@/routes/institution/roles';
+import { index as rolesIndex, edit as rolesEdit, update as rolesUpdate } from '@/routes/institution/roles';
 import { dashboard } from '@/routes/portal';
 
 type Institution = {
     id: number;
-    code: string;
     name: string;
 };
 
@@ -31,32 +30,42 @@ type Permission = {
     group: string;
 };
 
+type Role = {
+    id: number;
+    name: string;
+    display_name: string;
+    description?: string;
+    institution_id?: number;
+    permissions: Permission[];
+};
+
 type Props = {
+    role: Role;
     institutions: Institution[];
     permissions: Permission[];
 };
 
-export default function RoleCreate({ institutions = [], permissions = [] }: Props) {
+export default function RoleEdit({ role, institutions = [], permissions = [] }: Props) {
     const { currentPortal } = usePage<SharedData>().props;
     const code = currentPortal?.code ?? '';
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin Yayasan', href: dashboard.url(code) },
         { title: 'Role', href: rolesIndex.url(code) },
-        { title: 'Tambah', href: rolesCreate.url(code) },
+        { title: 'Edit', href: rolesEdit.url({ institution: code, role: role.id }) },
     ];
 
-    const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        display_name: '',
-        description: '',
-        institution_id: '',
-        permissions: [] as number[],
+    const { data, setData, put, processing, errors } = useForm({
+        name: role.name,
+        display_name: role.display_name,
+        description: role.description ?? '',
+        institution_id: role.institution_id ? String(role.institution_id) : '',
+        permissions: role.permissions.map((p) => p.id),
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(rolesStore.url(code));
+        put(rolesUpdate.url({ institution: code, role: role.id }));
     };
 
     const togglePermission = (permissionId: number) => {
@@ -76,7 +85,7 @@ export default function RoleCreate({ institutions = [], permissions = [] }: Prop
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tambah Role" />
+            <Head title={`Edit Role - ${role.display_name}`} />
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
@@ -85,8 +94,8 @@ export default function RoleCreate({ institutions = [], permissions = [] }: Prop
                         <Shield className="size-6 text-indigo-600" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold">Tambah Role Baru</h1>
-                        <p className="text-muted-foreground">Buat role dan atur permission</p>
+                        <h1 className="text-2xl font-bold">Edit Role</h1>
+                        <p className="text-muted-foreground">{role.display_name}</p>
                     </div>
                 </div>
 
@@ -141,14 +150,11 @@ export default function RoleCreate({ institutions = [], permissions = [] }: Prop
                                                 <SelectItem value="">Global (Semua Lembaga)</SelectItem>
                                                 {institutions.map((inst) => (
                                                     <SelectItem key={inst.id} value={String(inst.id)}>
-                                                        {inst.code} - {inst.name}
+                                                        {inst.name}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        <p className="text-sm text-muted-foreground">
-                                            Kosongkan untuk role global yang berlaku di semua lembaga
-                                        </p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -196,7 +202,7 @@ export default function RoleCreate({ institutions = [], permissions = [] }: Prop
                                 <CardContent className="pt-6">
                                     <div className="flex flex-col gap-2">
                                         <Button type="submit" disabled={processing}>
-                                            {processing ? 'Menyimpan...' : 'Simpan Role'}
+                                            {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                                         </Button>
                                         <Button variant="outline" asChild>
                                             <Link href={rolesIndex.url(code)}>Batal</Link>

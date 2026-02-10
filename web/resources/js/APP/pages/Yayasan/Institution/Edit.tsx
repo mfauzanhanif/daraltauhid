@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Building2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -14,7 +14,9 @@ import {
 } from '@/shared/ui/select';
 import { Switch } from '@/shared/ui/switch';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as institutionsIndex, show as institutionsShow, edit as institutionsEdit, update as institutionsUpdate } from '@/routes/institutions';
+import { dashboard } from '@/routes/portal';
 
 type Institution = {
     id: number;
@@ -34,11 +36,14 @@ type Props = {
 };
 
 export default function InstitutionEdit({ institution }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Admin Yayasan', href: '/admin/dashboard' },
-        { title: 'Lembaga', href: '/admin/institutions' },
-        { title: institution.code, href: `/admin/institutions/${institution.id}` },
-        { title: 'Edit', href: `/admin/institutions/${institution.id}/edit` },
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Lembaga', href: institutionsIndex.url(code) },
+        { title: institution.code, href: institutionsShow.url({ institution: code, inst: institution.id }) },
+        { title: 'Edit', href: institutionsEdit.url({ institution: code, inst: institution.id }) },
     ];
 
     const { data, setData, put, processing, errors } = useForm({
@@ -55,7 +60,7 @@ export default function InstitutionEdit({ institution }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/admin/institutions/${institution.id}`);
+        put(institutionsUpdate.url({ institution: code, inst: institution.id }));
     };
 
     return (
@@ -206,7 +211,7 @@ export default function InstitutionEdit({ institution }: Props) {
                                             {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                                         </Button>
                                         <Button variant="outline" asChild>
-                                            <Link href="/admin/institutions">Batal</Link>
+                                            <Link href={institutionsIndex.url(code)}>Batal</Link>
                                         </Button>
                                     </div>
                                 </CardContent>

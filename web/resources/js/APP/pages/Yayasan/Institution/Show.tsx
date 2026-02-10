@@ -1,10 +1,12 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Building2, Pencil, MapPin, Phone, Mail, Calendar, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as institutionsIndex, show as institutionsShow, edit as institutionsEdit } from '@/routes/institutions';
+import { dashboard } from '@/routes/portal';
 
 type Institution = {
     id: number;
@@ -25,10 +27,13 @@ type Props = {
 };
 
 export default function InstitutionShow({ institution }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Admin Yayasan', href: '/admin/dashboard' },
-        { title: 'Lembaga', href: '/admin/institutions' },
-        { title: institution.code, href: `/admin/institutions/${institution.id}` },
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Lembaga', href: institutionsIndex.url(code) },
+        { title: institution.code, href: institutionsShow.url({ institution: code, inst: institution.id }) },
     ];
 
     const getTypeBadge = (type: string) => {
@@ -71,7 +76,7 @@ export default function InstitutionShow({ institution }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href={`/admin/institutions/${institution.id}/edit`}>
+                        <Link href={institutionsEdit.url({ institution: code, inst: institution.id })}>
                             <Pencil className="mr-2 size-4" />
                             Edit Lembaga
                         </Link>

@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Calendar } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -7,44 +7,56 @@ import { Label } from '@/shared/ui/label';
 import { Switch } from '@/shared/ui/switch';
 import AppLayout from '@/APP/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { index as academicYearsIndex, create as academicYearsCreate, store as academicYearsStore } from '@/routes/academic-years';
+import { index as fiscalPeriodsIndex, edit as fiscalPeriodsEdit, update as fiscalPeriodsUpdate } from '@/routes/fiscal-periods';
 import { dashboard } from '@/routes/portal';
 
-export default function AcademicYearCreate() {
+type FiscalPeriod = {
+    id: number;
+    name: string;
+    start_date: string;
+    end_date: string;
+    is_active: boolean;
+};
+
+type Props = {
+    fiscalPeriod: FiscalPeriod;
+};
+
+export default function FiscalPeriodEdit({ fiscalPeriod }: Props) {
     const { currentPortal } = usePage<SharedData>().props;
     const code = currentPortal?.code ?? '';
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin Yayasan', href: dashboard.url(code) },
-        { title: 'Tahun Ajaran', href: academicYearsIndex.url(code) },
-        { title: 'Tambah', href: academicYearsCreate.url(code) },
+        { title: 'Periode Fiskal', href: fiscalPeriodsIndex.url(code) },
+        { title: 'Edit', href: fiscalPeriodsEdit.url({ institution: code, fiscal_period: fiscalPeriod.id }) },
     ];
 
-    const { data, setData, post, processing, errors } = useForm({
-        name: '',
-        start_date: '',
-        end_date: '',
-        is_active: false,
+    const { data, setData, put, processing, errors } = useForm({
+        name: fiscalPeriod.name,
+        start_date: fiscalPeriod.start_date,
+        end_date: fiscalPeriod.end_date,
+        is_active: fiscalPeriod.is_active,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(academicYearsStore.url(code));
+        put(fiscalPeriodsUpdate.url({ institution: code, fiscal_period: fiscalPeriod.id }));
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tambah Tahun Ajaran" />
+            <Head title={`Edit - ${fiscalPeriod.name}`} />
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                        <Calendar className="size-6 text-blue-600" />
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                        <DollarSign className="size-6 text-amber-600" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold">Tambah Tahun Ajaran</h1>
-                        <p className="text-muted-foreground">Buat tahun ajaran baru</p>
+                        <h1 className="text-2xl font-bold">Edit Periode Fiskal</h1>
+                        <p className="text-muted-foreground">{fiscalPeriod.name}</p>
                     </div>
                 </div>
 
@@ -53,15 +65,15 @@ export default function AcademicYearCreate() {
                         <div className="lg:col-span-2">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Informasi Tahun Ajaran</CardTitle>
-                                    <CardDescription>Periode tahun ajaran mengikuti kalender akademik (Juli - Juni)</CardDescription>
+                                    <CardTitle>Informasi Periode Fiskal</CardTitle>
+                                    <CardDescription>Periode tahun buku mengikuti kalender keuangan (Januari - Desember)</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="name">Nama Tahun Ajaran *</Label>
+                                        <Label htmlFor="name">Nama Periode *</Label>
                                         <Input
                                             id="name"
-                                            placeholder="2024/2025"
+                                            placeholder="2024"
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                         />
@@ -91,9 +103,9 @@ export default function AcademicYearCreate() {
                                     </div>
                                     <div className="flex items-center justify-between rounded-lg border p-4">
                                         <div>
-                                            <Label htmlFor="is_active">Aktifkan Tahun Ajaran</Label>
+                                            <Label htmlFor="is_active">Aktifkan Periode</Label>
                                             <p className="text-sm text-muted-foreground">
-                                                Hanya boleh ada satu tahun ajaran aktif
+                                                Hanya boleh ada satu periode fiskal aktif
                                             </p>
                                         </div>
                                         <Switch
@@ -111,10 +123,10 @@ export default function AcademicYearCreate() {
                                 <CardContent className="pt-6">
                                     <div className="flex flex-col gap-2">
                                         <Button type="submit" disabled={processing}>
-                                            {processing ? 'Menyimpan...' : 'Simpan'}
+                                            {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                                         </Button>
                                         <Button variant="outline" asChild>
-                                            <Link href={academicYearsIndex.url(code)}>Batal</Link>
+                                            <Link href={fiscalPeriodsIndex.url(code)}>Batal</Link>
                                         </Button>
                                     </div>
                                 </CardContent>

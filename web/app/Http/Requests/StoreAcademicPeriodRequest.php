@@ -12,7 +12,7 @@ class StoreAcademicPeriodRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // TODO: Add authorization logic
+        return $this->user()?->isGlobalAdmin() ?? false;
     }
 
     /**
@@ -31,16 +31,6 @@ class StoreAcademicPeriodRequest extends FormRequest
         ];
     }
 
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation(): void
-    {
-        // Check unique constraint (academic_year_id, name)
-        $this->merge([
-            '_unique_check' => true,
-        ]);
-    }
 
     /**
      * Configure the validator instance.

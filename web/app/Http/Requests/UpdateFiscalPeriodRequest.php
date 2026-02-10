@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\FiscalPeriodStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -12,7 +13,7 @@ class UpdateFiscalPeriodRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // TODO: Add authorization logic
+        return $this->user()?->isGlobalAdmin() ?? false;
     }
 
     /**
@@ -22,14 +23,14 @@ class UpdateFiscalPeriodRequest extends FormRequest
      */
     public function rules(): array
     {
-        $fiscalPeriodId = $this->route('fiscal_period')->id;
+        $fiscalPeriodId = $this->route('fiscal_period')?->id;
 
         return [
             'name' => ['required', 'string', 'max:20', Rule::unique('fiscal_periods')->ignore($fiscalPeriodId)],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after:start_date'],
             'is_active' => ['required', 'boolean'],
-            'status' => ['required', Rule::in(['OPEN', 'CLOSED', 'AUDITED'])],
+            'status' => ['required', Rule::enum(FiscalPeriodStatus::class)],
         ];
     }
 

@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\FiscalPeriodStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class FiscalPeriod extends Model
 {
@@ -33,13 +36,14 @@ class FiscalPeriod extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'is_active' => 'boolean',
+            'status' => FiscalPeriodStatus::class,
         ];
     }
 
     /**
      * Scope a query to only include active fiscal period.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -47,7 +51,7 @@ class FiscalPeriod extends Model
     /**
      * Scope a query to filter by status.
      */
-    public function scopeStatus($query, string $status)
+    public function scopeStatus(Builder $query, FiscalPeriodStatus $status): Builder
     {
         return $query->where('status', $status);
     }
@@ -55,25 +59,25 @@ class FiscalPeriod extends Model
     /**
      * Scope a query to only include open periods.
      */
-    public function scopeOpen($query)
+    public function scopeOpen(Builder $query): Builder
     {
-        return $query->where('status', 'OPEN');
+        return $query->where('status', FiscalPeriodStatus::OPEN);
     }
 
     /**
      * Scope a query to only include closed periods.
      */
-    public function scopeClosed($query)
+    public function scopeClosed(Builder $query): Builder
     {
-        return $query->where('status', 'CLOSED');
+        return $query->where('status', FiscalPeriodStatus::CLOSED);
     }
 
     /**
      * Scope a query to only include audited periods.
      */
-    public function scopeAudited($query)
+    public function scopeAudited(Builder $query): Builder
     {
-        return $query->where('status', 'AUDITED');
+        return $query->where('status', FiscalPeriodStatus::AUDITED);
     }
 
     /**
@@ -89,11 +93,16 @@ class FiscalPeriod extends Model
      */
     public function setAsActive(): void
     {
-        // Deactivate all other fiscal periods
-        static::where('id', '!=', $this->id)->update(['is_active' => false]);
-        
-        // Activate this one
-        $this->update(['is_active' => true]);
+        DB::transaction(function () {
+            // Lock semua row untuk mencegah race condition
+            static::query()->lockForUpdate()->get();
+
+            // Deactivate semua fiscal period lain
+            static::where('id', '!=', $this->id)->update(['is_active' => false]);
+
+            // Activate yang ini
+            $this->update(['is_active' => true]);
+        });
     }
 
     /**
@@ -101,7 +110,7 @@ class FiscalPeriod extends Model
      */
     public function isOpen(): bool
     {
-        return $this->status === 'OPEN';
+        return $this->status === FiscalPeriodStatus::OPEN;
     }
 
     /**
@@ -109,7 +118,7 @@ class FiscalPeriod extends Model
      */
     public function isClosed(): bool
     {
-        return $this->status === 'CLOSED';
+        return $this->status === FiscalPeriodStatus::CLOSED;
     }
 
     /**
@@ -117,7 +126,7 @@ class FiscalPeriod extends Model
      */
     public function isAudited(): bool
     {
-        return $this->status === 'AUDITED';
+        return $this->status === FiscalPeriodStatus::AUDITED;
     }
 
     /**
@@ -125,8 +134,8 @@ class FiscalPeriod extends Model
      */
     public function close(): void
     {
-        if ($this->status === 'OPEN') {
-            $this->update(['status' => 'CLOSED']);
+        if ($this->status === FiscalPeriodStatus::OPEN) {
+            $this->update(['status' => FiscalPeriodStatus::CLOSED]);
         }
     }
 
@@ -135,8 +144,8 @@ class FiscalPeriod extends Model
      */
     public function reopen(): void
     {
-        if ($this->status === 'CLOSED') {
-            $this->update(['status' => 'OPEN']);
+        if ($this->status === FiscalPeriodStatus::CLOSED) {
+            $this->update(['status' => FiscalPeriodStatus::OPEN]);
         }
     }
 
@@ -145,6 +154,6 @@ class FiscalPeriod extends Model
      */
     public function markAsAudited(): void
     {
-        $this->update(['status' => 'AUDITED']);
+        $this->update(['status' => FiscalPeriodStatus::AUDITED]);
     }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class AcademicPeriod extends Model
 {
@@ -48,7 +50,7 @@ class AcademicPeriod extends Model
     /**
      * Scope a query to only include active academic period.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -56,7 +58,7 @@ class AcademicPeriod extends Model
     /**
      * Scope a query to filter by semester name.
      */
-    public function scopeSemester($query, string $name)
+    public function scopeSemester(Builder $query, string $name): Builder
     {
         return $query->where('name', $name);
     }
@@ -74,12 +76,19 @@ class AcademicPeriod extends Model
      */
     public function setAsActive(): void
     {
-        // Deactivate all other periods in the same academic year
-        static::where('academic_year_id', $this->academic_year_id)
-            ->where('id', '!=', $this->id)
-            ->update(['is_active' => false]);
+        DB::transaction(function () {
+            // Lock semua period dalam tahun ajaran yang sama
+            static::where('academic_year_id', $this->academic_year_id)
+                ->lockForUpdate()
+                ->get();
 
-        // Activate this one
-        $this->update(['is_active' => true]);
+            // Deactivate semua period lain dalam tahun ajaran yang sama
+            static::where('academic_year_id', $this->academic_year_id)
+                ->where('id', '!=', $this->id)
+                ->update(['is_active' => false]);
+
+            // Activate yang ini
+            $this->update(['is_active' => true]);
+        });
     }
 }

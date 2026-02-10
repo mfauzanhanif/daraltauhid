@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Users, Plus, MoreHorizontal, Pencil, Trash2, Search, Mail, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -20,12 +20,9 @@ import {
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin Yayasan', href: '/admin/dashboard' },
-    { title: 'Users', href: '/admin/users' },
-];
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as usersIndex } from '@/routes/institution/users';
+import { dashboard } from '@/routes/portal';
 
 type User = {
     id: number;
@@ -41,6 +38,14 @@ type Props = {
 };
 
 export default function UserIndex({ users = [] }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Users', href: usersIndex.url(code) },
+    ];
+
     const getInitials = (name: string) => {
         return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
     };
@@ -62,7 +67,7 @@ export default function UserIndex({ users = [] }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href="/admin/users/create">
+                        <Link href={`${usersIndex.url(code)}/create`}>
                             <Plus className="mr-2 size-4" />
                             Tambah User
                         </Link>
@@ -148,7 +153,7 @@ export default function UserIndex({ users = [] }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/users/${user.id}/edit`}>
+                                                            <Link href={`${usersIndex.url(code)}/${user.id}/edit`}>
                                                                 <Pencil className="mr-2 size-4" />
                                                                 Edit
                                                             </Link>

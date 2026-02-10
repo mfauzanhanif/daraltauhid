@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Home, User, BookOpen, DollarSign, Calendar, GraduationCap, FileText, Phone } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
@@ -91,7 +91,7 @@ export default function WaliDashboard({ student }: Props) {
                 {/* Quick Menu */}
                 <div className="grid gap-4 md:grid-cols-2">
                     {menuItems.map((item) => (
-                        <a
+                        <Link
                             key={item.title}
                             href={item.href}
                             className="block"
@@ -109,7 +109,7 @@ export default function WaliDashboard({ student }: Props) {
                                     </div>
                                 </CardHeader>
                             </Card>
-                        </a>
+                        </Link>
                     ))}
                 </div>
 

@@ -9,6 +9,7 @@ export type CurrentPortal = {
     code: string;
     name: string;
     dashboardUrl: string;
+    is_root?: boolean;
 } | null;
 
 export type SharedData = {

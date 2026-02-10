@@ -94,7 +94,7 @@ Route::domain(env('APP_DOMAIN'))->group(function () {
     // Note: Using where() to prevent matching reserved paths
 
     Route::prefix('{institution}')
-        ->where(['institution' => '^(?!select-|switch-|wali|logout|login|register|forgot-password|reset-password|verify-email|confirm-password|settings)[A-Za-z0-9_-]+$'])
+        ->where(['institution' => '(?!select-|switch-|wali|logout|login|register|forgot-password|reset-password|verify-email|confirm-password|settings)[A-Za-z0-9_-]+$'])
         ->middleware([
             'auth:sanctum',
             'verified',

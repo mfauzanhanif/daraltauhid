@@ -74,8 +74,15 @@ class CheckInstitutionAccess
      */
     protected function injectSessionContext($institution, $user, string $accessType): void
     {
-        // Store access context for current request
+        // Hanya tulis session jika context berubah (optimasi: hindari write setiap request)
+        if (session('current_institution_id') === $institution->id
+            && session('institution_access_type') === $accessType) {
+            return;
+        }
+
+        // Store access context
         session([
+            'current_institution_id' => $institution->id,
             'institution_access_type' => $accessType,
             'institution_access_at' => now()->toIso8601String(),
         ]);

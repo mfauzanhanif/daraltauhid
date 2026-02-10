@@ -12,7 +12,7 @@ class UpdateAcademicYearRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // TODO: Add authorization logic
+        return $this->user()?->isGlobalAdmin() ?? false;
     }
 
     /**
@@ -22,7 +22,7 @@ class UpdateAcademicYearRequest extends FormRequest
      */
     public function rules(): array
     {
-        $academicYearId = $this->route('academic_year')->id;
+        $academicYearId = $this->route('academic_year')?->id;
 
         return [
             'name' => ['required', 'string', 'max:20', Rule::unique('academic_years')->ignore($academicYearId)],

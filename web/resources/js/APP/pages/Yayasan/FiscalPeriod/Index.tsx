@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { DollarSign, Plus, MoreHorizontal, Pencil, Trash2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -18,12 +18,9 @@ import {
     DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin Yayasan', href: '/admin/dashboard' },
-    { title: 'Periode Fiskal', href: '/admin/fiscal-periods' },
-];
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as fiscalPeriodsIndex, create as fiscalPeriodsCreate, edit as fiscalPeriodsEdit } from '@/routes/fiscal-periods';
+import { dashboard } from '@/routes/portal';
 
 type FiscalPeriod = {
     id: number;
@@ -38,6 +35,14 @@ type Props = {
 };
 
 export default function FiscalPeriodIndex({ fiscalPeriods = [] }: Props) {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Periode Fiskal', href: fiscalPeriodsIndex.url(code) },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Periode Fiskal" />
@@ -55,7 +60,7 @@ export default function FiscalPeriodIndex({ fiscalPeriods = [] }: Props) {
                         </div>
                     </div>
                     <Button asChild>
-                        <Link href="/admin/fiscal-periods/create">
+                        <Link href={fiscalPeriodsCreate.url(code)}>
                             <Plus className="mr-2 size-4" />
                             Tambah Periode
                         </Link>
@@ -110,7 +115,7 @@ export default function FiscalPeriodIndex({ fiscalPeriods = [] }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/fiscal-periods/${period.id}/edit`}>
+                                                            <Link href={fiscalPeriodsEdit.url({ institution: code, fiscal_period: period.id })}>
                                                                 <Pencil className="mr-2 size-4" />
                                                                 Edit
                                                             </Link>

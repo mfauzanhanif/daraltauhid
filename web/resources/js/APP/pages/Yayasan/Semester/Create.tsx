@@ -1,27 +1,45 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Calendar } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Switch } from '@/shared/ui/switch';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/shared/ui/select';
 import AppLayout from '@/APP/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { index as academicYearsIndex, create as academicYearsCreate, store as academicYearsStore } from '@/routes/academic-years';
+import { index as semestersIndex, create as semestersCreate, store as semestersStore } from '@/routes/semesters';
 import { dashboard } from '@/routes/portal';
 
-export default function AcademicYearCreate() {
+type AcademicYear = {
+    id: number;
+    name: string;
+};
+
+type Props = {
+    academicYears: AcademicYear[];
+};
+
+export default function SemesterCreate({ academicYears = [] }: Props) {
     const { currentPortal } = usePage<SharedData>().props;
     const code = currentPortal?.code ?? '';
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin Yayasan', href: dashboard.url(code) },
-        { title: 'Tahun Ajaran', href: academicYearsIndex.url(code) },
-        { title: 'Tambah', href: academicYearsCreate.url(code) },
+        { title: 'Semester', href: semestersIndex.url(code) },
+        { title: 'Tambah', href: semestersCreate.url(code) },
     ];
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
+        academic_year_id: '',
+        type: '',
         start_date: '',
         end_date: '',
         is_active: false,
@@ -29,22 +47,22 @@ export default function AcademicYearCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(academicYearsStore.url(code));
+        post(semestersStore.url(code));
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tambah Tahun Ajaran" />
+            <Head title="Tambah Semester" />
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                        <Calendar className="size-6 text-blue-600" />
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/30">
+                        <BookOpen className="size-6 text-purple-600" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold">Tambah Tahun Ajaran</h1>
-                        <p className="text-muted-foreground">Buat tahun ajaran baru</p>
+                        <h1 className="text-2xl font-bold">Tambah Semester</h1>
+                        <p className="text-muted-foreground">Buat periode semester baru</p>
                     </div>
                 </div>
 
@@ -53,19 +71,50 @@ export default function AcademicYearCreate() {
                         <div className="lg:col-span-2">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Informasi Tahun Ajaran</CardTitle>
-                                    <CardDescription>Periode tahun ajaran mengikuti kalender akademik (Juli - Juni)</CardDescription>
+                                    <CardTitle>Informasi Semester</CardTitle>
+                                    <CardDescription>Semester terkait dengan tahun ajaran</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="name">Nama Tahun Ajaran *</Label>
+                                        <Label htmlFor="name">Nama Semester *</Label>
                                         <Input
                                             id="name"
-                                            placeholder="2024/2025"
+                                            placeholder="Semester Ganjil 2024/2025"
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                         />
                                         {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                                    </div>
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="academic_year_id">Tahun Ajaran *</Label>
+                                            <Select value={data.academic_year_id} onValueChange={(v) => setData('academic_year_id', v)}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Pilih Tahun Ajaran" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {academicYears.map((year) => (
+                                                        <SelectItem key={year.id} value={String(year.id)}>
+                                                            {year.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.academic_year_id && <p className="text-sm text-destructive">{errors.academic_year_id}</p>}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="type">Tipe *</Label>
+                                            <Select value={data.type} onValueChange={(v) => setData('type', v)}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Pilih Tipe" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="ODD">Ganjil</SelectItem>
+                                                    <SelectItem value="EVEN">Genap</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
+                                        </div>
                                     </div>
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
@@ -91,9 +140,9 @@ export default function AcademicYearCreate() {
                                     </div>
                                     <div className="flex items-center justify-between rounded-lg border p-4">
                                         <div>
-                                            <Label htmlFor="is_active">Aktifkan Tahun Ajaran</Label>
+                                            <Label htmlFor="is_active">Aktifkan Semester</Label>
                                             <p className="text-sm text-muted-foreground">
-                                                Hanya boleh ada satu tahun ajaran aktif
+                                                Hanya boleh ada satu semester aktif
                                             </p>
                                         </div>
                                         <Switch
@@ -114,7 +163,7 @@ export default function AcademicYearCreate() {
                                             {processing ? 'Menyimpan...' : 'Simpan'}
                                         </Button>
                                         <Button variant="outline" asChild>
-                                            <Link href={academicYearsIndex.url(code)}>Batal</Link>
+                                            <Link href={semestersIndex.url(code)}>Batal</Link>
                                         </Button>
                                     </div>
                                 </CardContent>

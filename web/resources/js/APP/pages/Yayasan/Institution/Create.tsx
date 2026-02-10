@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Building2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
@@ -14,15 +14,20 @@ import {
 } from '@/shared/ui/select';
 import { Switch } from '@/shared/ui/switch';
 import AppLayout from '@/APP/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Admin Yayasan', href: '/admin/dashboard' },
-    { title: 'Lembaga', href: '/admin/institutions' },
-    { title: 'Tambah', href: '/admin/institutions/create' },
-];
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { index as institutionsIndex, create as institutionsCreate, store as institutionsStore } from '@/routes/institutions';
+import { dashboard } from '@/routes/portal';
 
 export default function InstitutionCreate() {
+    const { currentPortal } = usePage<SharedData>().props;
+    const code = currentPortal?.code ?? '';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Admin Yayasan', href: dashboard.url(code) },
+        { title: 'Lembaga', href: institutionsIndex.url(code) },
+        { title: 'Tambah', href: institutionsCreate.url(code) },
+    ];
+
     const { data, setData, post, processing, errors } = useForm({
         code: '',
         name: '',
@@ -37,7 +42,7 @@ export default function InstitutionCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/admin/institutions');
+        post(institutionsStore.url(code));
     };
 
     return (
@@ -199,7 +204,7 @@ export default function InstitutionCreate() {
                                             {processing ? 'Menyimpan...' : 'Simpan Lembaga'}
                                         </Button>
                                         <Button variant="outline" asChild>
-                                            <Link href="/admin/institutions">Batal</Link>
+                                            <Link href={institutionsIndex.url(code)}>Batal</Link>
                                         </Button>
                                     </div>
                                 </CardContent>

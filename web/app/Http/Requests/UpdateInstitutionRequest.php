@@ -2,42 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\InstitutionCategory;
+use App\Enums\InstitutionType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateInstitutionRequest extends FormRequest
 {
-    /**
-     * Institution type constants (matches migration ENUM).
-     */
-    public const TYPES = [
-        'YAYASAN',
-        'PONDOK',
-        'TK',
-        'SD',
-        'MI',
-        'SMP',
-        'MTS',
-        'SMA',
-        'MA',
-        'SMK',
-        'SLB',
-        'MDTA',
-        'TPQ',
-        'Madrasah',
-        'LKSA',
-    ];
-
-    /**
-     * Institution category constants (matches migration ENUM).
-     */
-    public const CATEGORIES = [
-        'YAYASAN',
-        'PONDOK',
-        'FORMAL',
-        'NON_FORMAL',
-        'SOSIAL',
-    ];
 
     /**
      * Determine if the user is authorized to make this request.
@@ -55,7 +26,7 @@ class UpdateInstitutionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $institutionId = $this->route('institution')->id;
+        $institutionId = $this->route('institution')?->id;
 
         return [
             'code' => ['required', 'string', 'max:20', Rule::unique('institutions')->ignore($institutionId)],
@@ -66,8 +37,8 @@ class UpdateInstitutionRequest extends FormRequest
             'no_statistic' => ['nullable', 'string', 'max:50'],
             'npsn' => ['nullable', 'string', 'max:20'],
             'is_internal' => ['required', 'boolean'],
-            'category' => ['required', Rule::in(self::CATEGORIES)],
-            'type' => ['required', Rule::in(self::TYPES)],
+            'category' => ['required', Rule::enum(InstitutionCategory::class)],
+            'type' => ['required', Rule::enum(InstitutionType::class)],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
             'website_url' => ['nullable', 'url', 'max:255'],

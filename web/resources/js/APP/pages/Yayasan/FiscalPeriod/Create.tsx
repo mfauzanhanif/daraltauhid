@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Calendar } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -7,17 +7,17 @@ import { Label } from '@/shared/ui/label';
 import { Switch } from '@/shared/ui/switch';
 import AppLayout from '@/APP/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { index as academicYearsIndex, create as academicYearsCreate, store as academicYearsStore } from '@/routes/academic-years';
+import { index as fiscalPeriodsIndex, create as fiscalPeriodsCreate, store as fiscalPeriodsStore } from '@/routes/fiscal-periods';
 import { dashboard } from '@/routes/portal';
 
-export default function AcademicYearCreate() {
+export default function FiscalPeriodCreate() {
     const { currentPortal } = usePage<SharedData>().props;
     const code = currentPortal?.code ?? '';
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin Yayasan', href: dashboard.url(code) },
-        { title: 'Tahun Ajaran', href: academicYearsIndex.url(code) },
-        { title: 'Tambah', href: academicYearsCreate.url(code) },
+        { title: 'Periode Fiskal', href: fiscalPeriodsIndex.url(code) },
+        { title: 'Tambah', href: fiscalPeriodsCreate.url(code) },
     ];
 
     const { data, setData, post, processing, errors } = useForm({
@@ -29,22 +29,22 @@ export default function AcademicYearCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(academicYearsStore.url(code));
+        post(fiscalPeriodsStore.url(code));
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tambah Tahun Ajaran" />
+            <Head title="Tambah Periode Fiskal" />
 
             <div className="flex flex-col gap-6 p-6">
                 {/* Header */}
                 <div className="flex items-center gap-3">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                        <Calendar className="size-6 text-blue-600" />
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+                        <DollarSign className="size-6 text-amber-600" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold">Tambah Tahun Ajaran</h1>
-                        <p className="text-muted-foreground">Buat tahun ajaran baru</p>
+                        <h1 className="text-2xl font-bold">Tambah Periode Fiskal</h1>
+                        <p className="text-muted-foreground">Buat tahun buku keuangan baru</p>
                     </div>
                 </div>
 
@@ -53,15 +53,15 @@ export default function AcademicYearCreate() {
                         <div className="lg:col-span-2">
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Informasi Tahun Ajaran</CardTitle>
-                                    <CardDescription>Periode tahun ajaran mengikuti kalender akademik (Juli - Juni)</CardDescription>
+                                    <CardTitle>Informasi Periode Fiskal</CardTitle>
+                                    <CardDescription>Periode tahun buku mengikuti kalender keuangan (Januari - Desember)</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="name">Nama Tahun Ajaran *</Label>
+                                        <Label htmlFor="name">Nama Periode *</Label>
                                         <Input
                                             id="name"
-                                            placeholder="2024/2025"
+                                            placeholder="2024"
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                         />
@@ -91,9 +91,9 @@ export default function AcademicYearCreate() {
                                     </div>
                                     <div className="flex items-center justify-between rounded-lg border p-4">
                                         <div>
-                                            <Label htmlFor="is_active">Aktifkan Tahun Ajaran</Label>
+                                            <Label htmlFor="is_active">Aktifkan Periode</Label>
                                             <p className="text-sm text-muted-foreground">
-                                                Hanya boleh ada satu tahun ajaran aktif
+                                                Hanya boleh ada satu periode fiskal aktif
                                             </p>
                                         </div>
                                         <Switch
@@ -114,7 +114,7 @@ export default function AcademicYearCreate() {
                                             {processing ? 'Menyimpan...' : 'Simpan'}
                                         </Button>
                                         <Button variant="outline" asChild>
-                                            <Link href={academicYearsIndex.url(code)}>Batal</Link>
+                                            <Link href={fiscalPeriodsIndex.url(code)}>Batal</Link>
                                         </Button>
                                     </div>
                                 </CardContent>
