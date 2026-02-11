@@ -27,41 +27,48 @@ class SetCurrentInstitution
     public function handle(Request $request, Closure $next): Response
     {
         // Ambil institution code dari route parameter
-        $institutionCode = $request->route('institution');
+        // Ambil institution code dari route parameter
+        $institutionParam = $request->route('institution');
 
-        if ($institutionCode) {
+        $institution = null;
+
+        if ($institutionParam instanceof Institution) {
+            $institution = $institutionParam;
+        } elseif (is_string($institutionParam)) {
             // Cek Cache dulu (Simpan selama 24 jam)
             $institution = Cache::remember(
-                "institution_code_{$institutionCode}",
+                "institution_code_{$institutionParam}",
                 60 * 60 * 24,
-                fn() => Institution::findByCode($institutionCode)
+                fn() => Institution::findByCode($institutionParam)
             );
+        }
 
-            if ($institution) {
-                // === SESSION INJECTION LOGIC ===
+        if ($institution) {
+            // === SESSION INJECTION LOGIC ===
 
-                // 1. Bind ke Service Container agar bisa diakses global via app('current_institution')
-                app()->instance('current_institution', $institution);
+            // 1. Bind ke Service Container agar bisa diakses global via app('current_institution')
+            app()->instance('current_institution', $institution);
 
-                // 2. Simpan di session untuk persistence antar request
-                session([
-                    'current_institution_id' => $institution->id,
-                    'current_institution_code' => $institution->code,
-                    'current_institution_name' => $institution->name,
-                ]);
+            // 2. Simpan di session untuk persistence antar request
+            session([
+                'current_institution_id' => $institution->id,
+                'current_institution_code' => $institution->code,
+                'current_institution_name' => $institution->name,
+            ]);
 
-                // 3. Share data ke View untuk frontend (Inertia/Blade)
-                view()->share('currentInstitution', $institution);
-            } else {
-                // Institution code tidak valid, abort 404
+            // 3. Share data ke View untuk frontend (Inertia/Blade)
+            view()->share('currentInstitution', $institution);
+        } else {
+            // Institution code tidak valid, abort 404
+            // Hanya abort jika ada parameter institution tapi tidak ketemu
+            if ($institutionParam) {
                 abort(404, 'Lembaga tidak ditemukan.');
             }
-        } else {
+        }
+        
+        if (!$institutionParam) {
             // Tidak ada institution context (Global routes seperti /admin)
             app()->instance('current_institution', null);
-
-            // Clear session jika sebelumnya ada
-            // NOTE: Jangan clear di sini, biarkan session tetap untuk reference
         }
 
         return $next($request);

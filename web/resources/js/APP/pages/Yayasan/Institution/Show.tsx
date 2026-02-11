@@ -18,6 +18,7 @@ type Institution = {
     address?: string;
     phone?: string;
     email?: string;
+    is_internal: boolean;
     is_active: boolean;
     created_at: string;
 };
@@ -131,7 +132,14 @@ export default function InstitutionShow({ institution }: Props) {
                             </CardHeader>
                             <CardContent>
                                 <div className="rounded-lg bg-muted p-4 font-mono text-sm">
-                                    app.daraltauhid.com/{institution.code.toLowerCase()}/dashboard
+                                    <Link
+                                        href={dashboard.url(institution.code.toLowerCase())}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="hover:underline text-primary break-all"
+                                    >
+                                        {dashboard.url(institution.code.toLowerCase()).replace(/^\/+/, '')}
+                                    </Link>
                                 </div>
                             </CardContent>
                         </Card>

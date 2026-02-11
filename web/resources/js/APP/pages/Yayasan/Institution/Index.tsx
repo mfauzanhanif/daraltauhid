@@ -30,6 +30,7 @@ type Institution = {
     nickname?: string;
     type: string;
     category: string;
+    is_internal: boolean;
     is_active: boolean;
 };
 

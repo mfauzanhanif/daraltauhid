@@ -28,6 +28,7 @@ type Institution = {
     address?: string;
     phone?: string;
     email?: string;
+    is_internal: boolean;
     is_active: boolean;
 };
 
@@ -55,6 +56,7 @@ export default function InstitutionEdit({ institution }: Props) {
         address: institution.address || '',
         phone: institution.phone || '',
         email: institution.email || '',
+        is_internal: institution.is_internal,
         is_active: institution.is_active,
     });
 
@@ -120,30 +122,64 @@ export default function InstitutionEdit({ institution }: Props) {
                                     </div>
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <Label htmlFor="type">Tipe Lembaga *</Label>
-                                            <Select value={data.type} onValueChange={(v) => setData('type', v)}>
+                                            <Label htmlFor="is_internal">Status Kepemilikan *</Label>
+                                            <Select
+                                                value={data.is_internal ? 'true' : 'false'}
+                                                onValueChange={(v) => setData('is_internal', v === 'true')}
+                                            >
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Pilih tipe" />
+                                                    <SelectValue placeholder="Pilih status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                    <SelectItem value="true">Internal (Milik Sendiri)</SelectItem>
+                                                    <SelectItem value="false">Eksternal (Mitra/Binaan)</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.is_internal && <p className="text-sm text-destructive">{errors.is_internal}</p>}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="category">Kategori Lembaga *</Label>
+                                            <Select value={data.category} onValueChange={(v) => setData('category', v)}>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Pilih kategori" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="YAYASAN">Yayasan</SelectItem>
                                                     <SelectItem value="PONDOK">Pondok Pesantren</SelectItem>
                                                     <SelectItem value="FORMAL">Pendidikan Formal</SelectItem>
                                                     <SelectItem value="NON_FORMAL">Pendidikan Non-Formal</SelectItem>
                                                     <SelectItem value="SOSIAL">Lembaga Sosial</SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="category">Kategori *</Label>
-                                            <Select value={data.category} onValueChange={(v) => setData('category', v)}>
+
+                                        <div className="space-y-2 md:col-span-2">
+                                            <Label htmlFor="type">Tipe / Jenjang *</Label>
+                                            <Select value={data.type} onValueChange={(v) => setData('type', v)}>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Pilih kategori" />
+                                                    <SelectValue placeholder="Pilih tipe/jenjang" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="INTERNAL">Internal (Milik Sendiri)</SelectItem>
-                                                    <SelectItem value="EXTERNAL">Eksternal (Mitra/Binaan)</SelectItem>
+                                                    <SelectItem value="YAYASAN">Yayasan</SelectItem>
+                                                    <SelectItem value="PONDOK">Pondok Pesantren</SelectItem>
+                                                    <SelectItem value="TK">TK (Taman Kanak-Kanak)</SelectItem>
+                                                    <SelectItem value="SD">SD (Sekolah Dasar)</SelectItem>
+                                                    <SelectItem value="MI">MI (Madrasah Ibtidaiyah)</SelectItem>
+                                                    <SelectItem value="SMP">SMP (Sekolah Menengah Pertama)</SelectItem>
+                                                    <SelectItem value="MTS">MTs (Madrasah Tsanawiyah)</SelectItem>
+                                                    <SelectItem value="SMA">SMA (Sekolah Menengah Atas)</SelectItem>
+                                                    <SelectItem value="MA">MA (Madrasah Aliyah)</SelectItem>
+                                                    <SelectItem value="SMK">SMK (Sekolah Menengah Kejuruan)</SelectItem>
+                                                    <SelectItem value="SLB">SLB (Sekolah Luar Biasa)</SelectItem>
+                                                    <SelectItem value="MDTA">MDTA (Madrasah Diniyah Takmiliyah Awaliyah)</SelectItem>
+                                                    <SelectItem value="TPQ">TPQ (Taman Pendidikan Al-Qur'an)</SelectItem>
+                                                    <SelectItem value="Madrasah">Madrasah (Umum)</SelectItem>
+                                                    <SelectItem value="LKSA">LKSA (Lembaga Kesejahteraan Sosial Anak)</SelectItem>
                                                 </SelectContent>
                                             </Select>
+                                            {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
                                         </div>
                                     </div>
                                 </CardContent>
